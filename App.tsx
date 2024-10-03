@@ -1,15 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import DatePicker from './components/date-time-picker/DateTimePickerComponent/DatePicker';
-import TimePicker from './components/date-time-picker/DateTimePickerComponent/TimePicker';
+import DateTimePicker from './components/date-time-picker/DateTimePickerComponent/DatePicker';
 
 export default function App() {
   return (
     <View style={styles.container}>
       <Text>Open up App.tsx to start working on your app!</Text>
       <StatusBar style="auto" />
-      <DatePicker />
-      <TimePicker />
+      <DateTimePicker componentName="DatePickerStyle1" />
     </View>
   );
 }
@@ -17,7 +15,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 20,
