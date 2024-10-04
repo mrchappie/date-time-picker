@@ -1,5 +1,5 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import {
   DayInfo,
   generateDaysToDisplay,
@@ -10,19 +10,75 @@ import Button from '../DateTimePickerComponent/UI/Button';
 import MonthPicker from '../DateTimePickerComponent/UI/MontPicker';
 import YearPicker from '../DateTimePickerComponent/UI/YearPicker';
 
-const DatePickerStyle1 = () => {
+type DatePickerStyle1Props = {
+  selectType: 'single' | 'multiple' | 'range';
+};
+
+const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({ selectType }) => {
   const [isYearMonthPickerVisible, setIsYearMonthPickerVisible] =
     useState<boolean>(false);
   const [currentMonth, setCurrentMonth] = useState<number>(
     new Date().getMonth()
   );
-  const [year, setYear] = useState<number>(new Date().getFullYear());
+  const [currentYear, setCurrentYear] = useState<number>(
+    new Date().getFullYear()
+  );
+  const [selectedDayOfTheMonth, setSelectedDayOfTheMonth] = useState<number>(
+    new Date().getDate()
+  );
+  const [currentDayOfTheWeek, setCurrentDayOfTheWeek] = useState<number>(
+    new Date().getDay()
+  );
+  const [selectedDays, setSelectedDays] = useState<number[]>([]);
+
+  useEffect(() => {
+    setDayOfTheWeek(selectedDayOfTheMonth);
+  }, [currentMonth, currentYear]);
+
+  function setDayOfTheWeek(dayOfTheMonth: number) {
+    const dayOfTheWeek = new Date(
+      currentYear,
+      currentMonth,
+      dayOfTheMonth
+    ).getDay();
+    setCurrentDayOfTheWeek(dayOfTheWeek);
+  }
 
   function renderDay({ dayNumber, hideDayBox }: DayInfo) {
+    const isCurrentDay = Number(dayNumber) === selectedDayOfTheMonth;
+    const isDaySelected = selectedDays.some((day) => day === Number(dayNumber));
     return (
-      <View style={{ ...styles.day, opacity: hideDayBox ? 0 : 1 }}>
-        <Text style={{ fontWeight: 600, userSelect: 'none' }}>{dayNumber}</Text>
-      </View>
+      <Pressable
+        onPress={() => {
+          if (!hideDayBox) {
+            if (selectType === 'single') {
+              setSelectedDays(() => {
+                return [Number(dayNumber)];
+              });
+            } else {
+              setSelectedDays((prevState) => {
+                return [...prevState, Number(dayNumber)];
+              });
+            }
+          }
+        }}
+        style={[
+          styles.day,
+          isCurrentDay && styles.isCurrentDay,
+          isDaySelected && styles.isDaySelected,
+          { opacity: hideDayBox ? 0 : 1 },
+        ]}
+      >
+        <Text
+          style={{
+            fontWeight: 600,
+            userSelect: 'none',
+            color: isDaySelected ? '#fff' : '#000',
+          }}
+        >
+          {dayNumber}
+        </Text>
+      </Pressable>
     );
   }
 
@@ -30,7 +86,7 @@ const DatePickerStyle1 = () => {
     <View style={styles.container}>
       <View style={styles.headerButtons}>
         <Button
-          title={`${months[currentMonth]} - ${year.toString()}`}
+          title={`${months[currentMonth]} - ${currentYear.toString()}`}
           defaultSelected
           onButtonPress={() => {
             setIsYearMonthPickerVisible(!isYearMonthPickerVisible);
@@ -50,7 +106,7 @@ const DatePickerStyle1 = () => {
                   if (prevState > 0) {
                     return prevState - 1;
                   } else {
-                    setYear((prevState) => prevState - 1);
+                    setCurrentYear((prevState) => prevState - 1);
                     return 11;
                   }
                 });
@@ -66,7 +122,7 @@ const DatePickerStyle1 = () => {
                   if (prevState < 11) {
                     return prevState + 1;
                   } else {
-                    setYear((prevState) => prevState + 1);
+                    setCurrentYear((prevState) => prevState + 1);
                     return 0;
                   }
                 });
@@ -77,17 +133,27 @@ const DatePickerStyle1 = () => {
           <View style={styles.calendarContainer}>
             <FlatList
               data={weekdays}
-              renderItem={({ item }) => (
-                <View style={styles.dayLabel}>
-                  <Text style={{ fontWeight: 600 }}>{item.slice(0, 3)}</Text>
-                </View>
-              )}
+              renderItem={({ item, index }) => {
+                const isSelected = currentDayOfTheWeek === index;
+                return (
+                  <View
+                    style={[
+                      styles.dayLabel,
+                      isSelected && styles.isDayLabelSelected,
+                    ]}
+                  >
+                    <Text style={{ fontWeight: '600', fontSize: 14 }}>
+                      {item.slice(0, 3)}
+                    </Text>
+                  </View>
+                );
+              }}
               numColumns={7}
               columnWrapperStyle={{ gap: 5 }}
               contentContainerStyle={{ gap: 5 }}
             />
             <FlatList
-              data={generateDaysToDisplay(year, currentMonth)}
+              data={generateDaysToDisplay(currentYear, currentMonth)}
               renderItem={({ item }) => renderDay(item)}
               numColumns={7}
               columnWrapperStyle={{ gap: 5 }}
@@ -99,11 +165,18 @@ const DatePickerStyle1 = () => {
       {isYearMonthPickerVisible && (
         <View style={styles.yearMonthPickerContainer}>
           <MonthPicker currentMonth={9} />
-          <YearPicker currentYear={year} />
+          <YearPicker currentYear={currentYear} />
         </View>
       )}
       <View style={styles.selectedDateDisplay}>
-        <Text>Saturday, September 28 2024</Text>
+        <Text
+          style={{
+            fontWeight: '600',
+            fontSize: 16,
+          }}
+        >
+          {`${weekdays[currentDayOfTheWeek]}, ${months[currentMonth]} ${selectedDayOfTheMonth} ${currentYear}`}
+        </Text>
       </View>
     </View>
   );
@@ -111,62 +184,77 @@ const DatePickerStyle1 = () => {
 
 export default DatePickerStyle1;
 
+const DAY_LABEL_SIZE = 40;
+
 const styles = StyleSheet.create({
   container: {
-    minWidth: 300,
-    minHeight: 400,
+    width: 350,
+    height: 450,
     gap: 10,
     padding: 20,
-    // flex: 1,
+    paddingBottom: 30,
     alignItems: 'center',
-    backgroundColor: '#222',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+
+    // shadowColor: '#000',
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 2,
+    // },
+    // shadowOpacity: 0.25,
+    // shadowRadius: 3.84,
+    // elevation: 5,
   },
   headerButtons: {
-    // width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
     gap: 10,
   },
   changeMonthButtons: {
-    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 10,
-    paddingHorizontal: 20,
+    // paddingHorizontal: 20,
   },
   calendarContainer: {
     flex: 1,
     // marginVertical: 30,
-    marginHorizontal: 20,
+    // marginHorizontal: 20,
     flexDirection: 'column',
-    backgroundColor: 'green',
+    // backgroundColor: 'green',
   },
   day: {
-    width: 35,
-    height: 35,
+    width: DAY_LABEL_SIZE,
+    height: DAY_LABEL_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'white',
     color: 'black',
-    borderRadius: 9999,
+    borderRadius: 5,
     borderColor: 'black',
     borderWidth: 1,
   },
-  dayLabel: { width: 35, alignItems: 'center' },
+  isCurrentDay: {
+    borderColor: 'blue',
+    borderWidth: 2,
+  },
+  isDaySelected: {
+    backgroundColor: 'black',
+    borderColor: 'black',
+    borderWidth: 1,
+  },
+  dayLabel: { width: DAY_LABEL_SIZE, alignItems: 'center' },
+  isDayLabelSelected: {
+    borderBottomColor: 'blue',
+    borderBottomWidth: 2,
+  },
   selectedDateDisplay: {
     position: 'absolute',
-    bottom: 5,
-    left: 5,
+    bottom: 10,
+    left: 10,
   },
   yearMonthPickerContainer: {
     flexDirection: 'row',

@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 import TimePickerStyle1 from '../styles/TimePickerStyle1';
+import ModalManager from './UI/ModalManager';
 
 const StylesLookup: { [key: string]: React.ComponentType } = {
   TimePickerStyle1: TimePickerStyle1,
@@ -10,16 +11,43 @@ type ComponentName =
   | 'TimePickerStyle2'
   | 'TimePickerStyle2';
 
-const TimePicker = (props: { componentName: ComponentName }) => {
-  const Component = StylesLookup[props.componentName];
+type TimePickerProps = {
+  componentName: ComponentName;
+  onCloseModal: () => void;
+  isModalVisible?: boolean;
+  withModal?: boolean;
+  onHandleResponse?: () => void;
+};
+
+const TimePicker = (props: TimePickerProps) => {
+  const {
+    componentName,
+    isModalVisible = false,
+    withModal = true,
+    onCloseModal,
+  } = props;
+  const Component = StylesLookup[componentName];
+
+  // return default message is component name( component style ) is wrong
   if (!Component) {
     return (
       <View>
-        <Text>No component found!</Text>
+        <Text style={{ color: '#fff' }}>No component found!</Text>
       </View>
     );
   }
-  return <Component />;
+
+  // return standalone component without modal
+  if (!withModal) {
+    return <Component />;
+  }
+
+  // return component with modal
+  return (
+    <ModalManager visible={isModalVisible} handleModalClose={onCloseModal}>
+      <Component />
+    </ModalManager>
+  );
 };
 
 export default TimePicker;

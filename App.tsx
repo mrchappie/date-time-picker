@@ -1,13 +1,44 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import DateTimePicker from './components/date-time-picker/DateTimePickerComponent/DatePicker';
+import { Button, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import DatePicker from './components/date-time-picker/DateTimePickerComponent/DatePicker';
+import TimePicker from './components/date-time-picker/DateTimePickerComponent/TimePicker';
 
 export default function App() {
+  const [isDatePickerVisible, setIsDatePickerVisible] =
+    useState<boolean>(false);
+  const [isTimePickerVisible, setIsTimePickerVisible] =
+    useState<boolean>(false);
   return (
     <View style={styles.container}>
       <Text>Open up App.tsx to start working on your app!</Text>
       <StatusBar style="auto" />
-      <DateTimePicker componentName="DatePickerStyle1" />
+      <Button
+        title="Open Date Picker"
+        onPress={() => {
+          setIsDatePickerVisible(true);
+        }}
+      />
+      <Button
+        title="Open Time Picker"
+        onPress={() => {
+          setIsTimePickerVisible(true);
+        }}
+      />
+      <DatePicker
+        componentName="DatePickerStyle1"
+        isModalVisible={isDatePickerVisible}
+        onCloseModal={() => {
+          setIsDatePickerVisible(false);
+        }}
+      />
+      <TimePicker
+        componentName="TimePickerStyle1"
+        isModalVisible={isTimePickerVisible}
+        onCloseModal={() => {
+          setIsTimePickerVisible(false);
+        }}
+      />
     </View>
   );
 }

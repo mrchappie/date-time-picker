@@ -60,76 +60,74 @@ const TimePickerStyle1 = (props: TimePickerStyle1Props) => {
   }
 
   return (
-    <View style={styles.insideView}>
-      <View style={styles.container}>
-        <View style={styles.picker}>
-          <FlatList
-            ref={hoursRef}
-            data={extendedHoursList}
-            keyExtractor={(_, index) => index.toString()}
-            renderItem={({ item }) => renderItem(item, selectedHour)}
-            showsVerticalScrollIndicator={false}
-            //   snapToAlignment="center"
-            snapToInterval={ITEM_HEIGHT}
-            initialScrollIndex={selectedHour}
-            getItemLayout={(_, index) => ({
-              length: ITEM_HEIGHT,
-              offset: ITEM_HEIGHT * index,
-              index,
-            })}
-            contentContainerStyle={{ marginVertical: 5 }}
-            onMomentumScrollEnd={(event) => {
-              const index = Math.round(
-                event.nativeEvent.contentOffset.y / ITEM_HEIGHT
-              );
-              // setExtendedHoursList(hours);
-              setSelectedHour(extendedHoursList[index + 2]);
-            }}
-            onEndReached={() => {
-              console.log('scroll reached end');
-              handleScrollReachedEnd();
-            }}
-            onStartReached={() => {
-              console.log('scroll reached start');
-              // handleScrollReachedStart();
-            }}
-            onEndReachedThreshold={0.1}
-            onStartReachedThreshold={0.1}
-          />
-        </View>
-        <View style={styles.picker}>
-          <FlatList
-            ref={minutesRef}
-            data={minutes}
-            keyExtractor={(item) => item.toString()}
-            renderItem={({ item }) => renderItem(item, selectedMinutes)}
-            showsVerticalScrollIndicator={false}
-            // snapToAlignment="center"
-            snapToInterval={ITEM_HEIGHT}
-            decelerationRate={'fast'}
-            initialScrollIndex={selectedMinutes}
-            getItemLayout={(_, index) => ({
-              length: ITEM_HEIGHT,
-              offset: ITEM_HEIGHT * index,
-              index,
-            })}
-            contentContainerStyle={{ marginVertical: 5 }}
-            onMomentumScrollEnd={(event) => {
-              // const index = Math.round(
-              //   event.nativeEvent.contentOffset.y / ITEM_HEIGHT
-              // );
-              // setSelectedMinute(minutes[index]);
-              console.log('scroll reached end');
-              setExtendedHoursList((prevState) => {
-                return prevState.slice(0, hours.length);
-              });
-            }}
-            onEndReachedThreshold={5}
-            onScroll={(event) => {
-              console.log(event.nativeEvent.contentOffset.y < ITEM_HEIGHT);
-            }}
-          />
-        </View>
+    <View style={styles.container}>
+      <View style={styles.picker}>
+        <FlatList
+          ref={hoursRef}
+          data={extendedHoursList}
+          keyExtractor={(_, index) => index.toString()}
+          renderItem={({ item }) => renderItem(item, selectedHour)}
+          showsVerticalScrollIndicator={false}
+          //   snapToAlignment="center"
+          snapToInterval={ITEM_HEIGHT}
+          initialScrollIndex={selectedHour}
+          getItemLayout={(_, index) => ({
+            length: ITEM_HEIGHT,
+            offset: ITEM_HEIGHT * index,
+            index,
+          })}
+          contentContainerStyle={{ marginVertical: 5 }}
+          onMomentumScrollEnd={(event) => {
+            const index = Math.round(
+              event.nativeEvent.contentOffset.y / ITEM_HEIGHT
+            );
+            // setExtendedHoursList(hours);
+            setSelectedHour(extendedHoursList[index + 2]);
+          }}
+          onEndReached={() => {
+            console.log('scroll reached end');
+            handleScrollReachedEnd();
+          }}
+          onStartReached={() => {
+            console.log('scroll reached start');
+            // handleScrollReachedStart();
+          }}
+          onEndReachedThreshold={0.1}
+          onStartReachedThreshold={0.1}
+        />
+      </View>
+      <View style={styles.picker}>
+        <FlatList
+          ref={minutesRef}
+          data={minutes}
+          keyExtractor={(item) => item.toString()}
+          renderItem={({ item }) => renderItem(item, selectedMinutes)}
+          showsVerticalScrollIndicator={false}
+          // snapToAlignment="center"
+          snapToInterval={ITEM_HEIGHT}
+          decelerationRate={'fast'}
+          initialScrollIndex={selectedMinutes}
+          getItemLayout={(_, index) => ({
+            length: ITEM_HEIGHT,
+            offset: ITEM_HEIGHT * index,
+            index,
+          })}
+          contentContainerStyle={{ marginVertical: 5 }}
+          onMomentumScrollEnd={(event) => {
+            // const index = Math.round(
+            //   event.nativeEvent.contentOffset.y / ITEM_HEIGHT
+            // );
+            // setSelectedMinute(minutes[index]);
+            console.log('scroll reached end');
+            setExtendedHoursList((prevState) => {
+              return prevState.slice(0, hours.length);
+            });
+          }}
+          onEndReachedThreshold={5}
+          onScroll={(event) => {
+            console.log(event.nativeEvent.contentOffset.y < ITEM_HEIGHT);
+          }}
+        />
       </View>
     </View>
   );
@@ -138,12 +136,6 @@ const TimePickerStyle1 = (props: TimePickerStyle1Props) => {
 export default TimePickerStyle1;
 
 const styles = StyleSheet.create({
-  insideView: {
-    // flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   container: {
     flexDirection: 'row',
     height: 200,
