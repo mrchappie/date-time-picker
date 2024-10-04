@@ -4,14 +4,14 @@ import React, { ReactElement, useEffect, useState } from 'react';
 type ModalManagerProps = {
   visible: boolean;
   children: ReactElement;
-  handleModalClose: () => void;
+  onCloseModal: () => void;
 };
 
 const ModalManager = (props: ModalManagerProps) => {
-  const { visible, children, handleModalClose } = props;
+  const { visible, children, onCloseModal } = props;
 
   return (
-    <Modal transparent visible={visible} onRequestClose={handleModalClose}>
+    <Modal transparent visible={visible} onRequestClose={onCloseModal}>
       <View style={styles.insideView}>{children}</View>
     </Modal>
   );

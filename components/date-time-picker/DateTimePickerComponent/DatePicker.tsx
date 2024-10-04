@@ -2,12 +2,6 @@ import { Text, View } from 'react-native';
 import DatePickerStyle1 from '../styles/DatePickerStyle1';
 import ModalManager from './UI/ModalManager';
 
-const StylesLookup: {
-  [key: string]: React.ComponentType<{ selectType: DateSelectType }>;
-} = {
-  DatePickerStyle1: DatePickerStyle1,
-};
-
 type ComponentName =
   | 'DatePickerStyle1'
   | 'DatePickerStyle2'
@@ -17,11 +11,23 @@ type DateSelectType = 'single' | 'multiple' | 'range';
 
 type DatePickerProps = {
   componentName: ComponentName;
-  onCloseModal: () => void;
+  onModalClose: () => void;
   isModalVisible?: boolean;
   withModal?: boolean;
-  onHandleResponse?: () => void;
+  onResponse: (date: number) => void;
   dateSelectType?: DateSelectType;
+};
+
+type StylesLookupProps = {
+  [key: string]: React.ComponentType<{
+    calendarSelectType: DateSelectType;
+    onResponse: (date: number) => void;
+    defaultDate?: number;
+  }>;
+};
+
+const StylesLookup: StylesLookupProps = {
+  DatePickerStyle1: DatePickerStyle1,
 };
 
 const DatePicker = (props: DatePickerProps) => {
@@ -29,7 +35,8 @@ const DatePicker = (props: DatePickerProps) => {
     componentName,
     isModalVisible = false,
     withModal = true,
-    onCloseModal,
+    onModalClose,
+    onResponse,
     dateSelectType = 'single',
   } = props;
   const Component = StylesLookup[componentName];
@@ -45,13 +52,19 @@ const DatePicker = (props: DatePickerProps) => {
 
   // return standalone component without modal
   if (!withModal) {
-    return <Component selectType={dateSelectType} />;
+    return (
+      <Component calendarSelectType={dateSelectType} onResponse={onResponse} />
+    );
   }
 
   // return component with modal
   return (
-    <ModalManager visible={isModalVisible} handleModalClose={onCloseModal}>
-      <Component selectType={dateSelectType} />
+    <ModalManager visible={isModalVisible} onCloseModal={onModalClose}>
+      <Component
+        calendarSelectType={dateSelectType}
+        onResponse={onResponse}
+        defaultDate={1729976400000}
+      />
     </ModalManager>
   );
 };

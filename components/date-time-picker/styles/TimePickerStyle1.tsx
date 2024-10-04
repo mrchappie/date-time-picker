@@ -11,8 +11,7 @@ type TimePickerStyle1Props = {
 const ITEM_HEIGHT = 40;
 const VISIBLE_ITEMS = hours.length / 2;
 
-const TimePickerStyle1 = (props: TimePickerStyle1Props) => {
-  const { visible } = props;
+const TimePickerStyle1: React.FC<TimePickerStyle1Props> = ({ visible }) => {
   const [selectedHour, setSelectedHour] = useState<number>(7);
   const [selectedMinutes, setSelectedMinute] = useState<number>(0);
   const [extendedHoursList, setExtendedHoursList] = useState<number[]>(hours);

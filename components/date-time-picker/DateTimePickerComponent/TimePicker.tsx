@@ -13,7 +13,7 @@ type ComponentName =
 
 type TimePickerProps = {
   componentName: ComponentName;
-  onCloseModal: () => void;
+  handleModalClose: () => void;
   isModalVisible?: boolean;
   withModal?: boolean;
   onHandleResponse?: () => void;
@@ -24,7 +24,7 @@ const TimePicker = (props: TimePickerProps) => {
     componentName,
     isModalVisible = false,
     withModal = true,
-    onCloseModal,
+    handleModalClose,
   } = props;
   const Component = StylesLookup[componentName];
 
@@ -44,7 +44,7 @@ const TimePicker = (props: TimePickerProps) => {
 
   // return component with modal
   return (
-    <ModalManager visible={isModalVisible} handleModalClose={onCloseModal}>
+    <ModalManager visible={isModalVisible} onCloseModal={handleModalClose}>
       <Component />
     </ModalManager>
   );

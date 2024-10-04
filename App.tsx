@@ -28,14 +28,19 @@ export default function App() {
       <DatePicker
         componentName="DatePickerStyle1"
         isModalVisible={isDatePickerVisible}
-        onCloseModal={() => {
+        onModalClose={() => {
           setIsDatePickerVisible(false);
         }}
+        onResponse={(date) => {
+          // setIsDatePickerVisible(false);
+          console.log(date);
+        }}
+        dateSelectType="single"
       />
       <TimePicker
         componentName="TimePickerStyle1"
         isModalVisible={isTimePickerVisible}
-        onCloseModal={() => {
+        handleModalClose={() => {
           setIsTimePickerVisible(false);
         }}
       />
