@@ -1,5 +1,10 @@
-import { Modal, StyleSheet, View } from 'react-native';
-import React, { ReactElement, useEffect, useState } from 'react';
+import {
+  Modal,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
+import React, { ReactElement } from 'react';
 
 type ModalManagerProps = {
   visible: boolean;
@@ -12,6 +17,9 @@ const ModalManager = (props: ModalManagerProps) => {
 
   return (
     <Modal transparent visible={visible} onRequestClose={onCloseModal}>
+      <TouchableWithoutFeedback onPress={onCloseModal}>
+        <View style={styles.background}></View>
+      </TouchableWithoutFeedback>
       <View style={styles.insideView}>{children}</View>
     </Modal>
   );
@@ -20,10 +28,19 @@ const ModalManager = (props: ModalManagerProps) => {
 export default ModalManager;
 
 const styles = StyleSheet.create({
-  insideView: {
+  background: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  insideView: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
 });

@@ -3,18 +3,25 @@ import React, { useState } from 'react';
 
 type YearPickerProps = {
   currentYear: number;
+  onChange: (year: number) => void;
 };
 const yearsArray = new Array(37).fill('').map((_, index) => `${2000 + index}`);
 const ITEM_HEIGHT = 40;
 
 const YearPicker = (props: YearPickerProps) => {
-  //   const { currentYear } = props;
-  const [year, setYear] = useState<number>(props.currentYear);
+  const { currentYear, onChange } = props;
+  const [year, setYear] = useState<number>(currentYear);
   function renderItem({ item }: { item: string }) {
     const isSelected = +item === year;
     return (
       <Text style={[styles.year, isSelected && styles.selected]}>{item}</Text>
     );
+  }
+
+  function handleSelectedYear(year: number) {
+    // add two to set the centered month
+    onChange(year);
+    setYear(year);
   }
 
   return (
@@ -35,7 +42,7 @@ const YearPicker = (props: YearPickerProps) => {
           const index = Math.round(
             event.nativeEvent.contentOffset.y / ITEM_HEIGHT
           );
-          setYear(+yearsArray[index]);
+          handleSelectedYear(+yearsArray[index + 2]);
         }}
       />
     </View>
@@ -55,13 +62,13 @@ const styles = StyleSheet.create({
   },
   year: {
     color: 'black',
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: '900',
     paddingHorizontal: 20,
     height: ITEM_HEIGHT,
+    textAlignVertical: 'center',
   },
   selected: {
-    color: 'blue',
-    backgroundColor: 'yellow',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
   },
 });

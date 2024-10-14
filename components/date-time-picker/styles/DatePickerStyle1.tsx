@@ -11,7 +11,7 @@ import MonthPicker from '../DateTimePickerComponent/UI/MontPicker';
 import YearPicker from '../DateTimePickerComponent/UI/YearPicker';
 
 type DatePickerStyle1Props = {
-  calendarSelectType: 'single' | 'multiple' | 'range';
+  calendarSelectType: 'single' | 'multiple'; // | 'range';
   onResponse: (date: number) => void;
   defaultDate?: number;
 };
@@ -25,24 +25,24 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
   const DATE = defaultDate ? new Date(defaultDate as number) : new Date();
   const [isYearMonthPickerVisible, setIsYearMonthPickerVisible] =
     useState<boolean>(false);
-  const [currentMonth, setCurrentMonth] = useState<number>(DATE.getMonth());
-  const [currentYear, setCurrentYear] = useState<number>(DATE.getFullYear());
-  const [selectedDayOfTheMonth, setSelectedDayOfTheMonth] = useState<number>(
-    new Date().getDate()
-  );
+  const [currentDate] = useState(new Date());
+
+  const [selectedMonth, setSelectedMonth] = useState<number>(DATE.getMonth());
+  const [selectedYear, setSelectedYear] = useState<number>(DATE.getFullYear());
+  const [selectedDayOfTheMonth] = useState<number>(currentDate.getDate());
   const [currentDayOfTheWeek, setCurrentDayOfTheWeek] = useState<number>(
-    new Date().getDay()
+    currentDate.getDay()
   );
   const [selectedDays, setSelectedDays] = useState<number[]>([+DATE.getDate()]);
 
-  useEffect(() => {
-    setDayOfTheWeek(selectedDayOfTheMonth);
-  }, [currentMonth, currentYear]);
+  // useEffect(() => {
+  //   setDayOfTheWeek(selectedDayOfTheMonth);
+  // }, [selectedMonth, selectedYear]);
 
   function setDayOfTheWeek(dayOfTheMonth: number) {
     const dayOfTheWeek = new Date(
-      currentYear,
-      currentMonth,
+      selectedYear,
+      selectedMonth,
       dayOfTheMonth
     ).getDay();
     setCurrentDayOfTheWeek(dayOfTheWeek);
@@ -61,17 +61,17 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
       });
       handleSendDateBackToUser(dayNumber);
     }
-    if (calendarSelectType === 'range') {
-      setSelectedDays((prevState) => {
-        return [...prevState, Number(dayNumber)];
-      });
-      handleSendDateBackToUser(dayNumber);
-    }
+    // if (calendarSelectType === 'range') {
+    //   setSelectedDays((prevState) => {
+    //     return [...prevState, Number(dayNumber)];
+    //   });
+    //   handleSendDateBackToUser(dayNumber);
+    // }
     // setSelectedDayOfTheMonth(dayNumber);
   }
 
   function handleSendDateBackToUser(dayNumber: number) {
-    const date = new Date(currentYear, currentMonth, dayNumber).getTime();
+    const date = new Date(selectedYear, selectedMonth, dayNumber).getTime();
     onResponse(date);
   }
 
@@ -109,7 +109,7 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
     <View style={styles.container}>
       <View style={styles.headerButtons}>
         <Button
-          title={`${months[currentMonth]} - ${currentYear.toString()}`}
+          title={`${months[selectedMonth]} - ${selectedYear.toString()}`}
           defaultSelected
           onButtonPress={() => {
             setIsYearMonthPickerVisible(!isYearMonthPickerVisible);
@@ -121,15 +121,15 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
           <View style={styles.changeMonthButtons}>
             <Button
               title={`${
-                currentMonth > 0 ? months[currentMonth - 1] : months[11]
+                selectedMonth > 0 ? months[selectedMonth - 1] : months[11]
               }`}
               defaultSelected
               onButtonPress={() => {
-                setCurrentMonth((prevState) => {
+                setSelectedMonth((prevState) => {
                   if (prevState > 0) {
                     return prevState - 1;
                   } else {
-                    setCurrentYear((prevState) => prevState - 1);
+                    setSelectedYear((prevState) => prevState - 1);
                     return 11;
                   }
                 });
@@ -137,15 +137,15 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
             />
             <Button
               title={`${
-                currentMonth < 11 ? months[currentMonth + 1] : months[0]
+                selectedMonth < 11 ? months[selectedMonth + 1] : months[0]
               }`}
               defaultSelected
               onButtonPress={() => {
-                setCurrentMonth((prevState) => {
+                setSelectedMonth((prevState) => {
                   if (prevState < 11) {
                     return prevState + 1;
                   } else {
-                    setCurrentYear((prevState) => prevState + 1);
+                    setSelectedYear((prevState) => prevState + 1);
                     return 0;
                   }
                 });
@@ -176,7 +176,7 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
               contentContainerStyle={{ gap: 5 }}
             />
             <FlatList
-              data={generateDaysToDisplay(currentYear, currentMonth)}
+              data={generateDaysToDisplay(selectedYear, selectedMonth)}
               renderItem={({ item }) => renderDay(item)}
               numColumns={7}
               columnWrapperStyle={{ gap: 5 }}
@@ -187,8 +187,18 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
       )}
       {isYearMonthPickerVisible && (
         <View style={styles.yearMonthPickerContainer}>
-          <MonthPicker currentMonth={9} />
-          <YearPicker currentYear={currentYear} />
+          <MonthPicker
+            currentMonth={selectedMonth}
+            onChange={(monthIndex) => {
+              setSelectedMonth(monthIndex);
+            }}
+          />
+          <YearPicker
+            currentYear={selectedYear}
+            onChange={(year) => {
+              setSelectedYear(year);
+            }}
+          />
         </View>
       )}
       <View style={styles.selectedDateDisplay}>
@@ -198,9 +208,13 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
             fontSize: 16,
           }}
         >
-          {`${weekdays[currentDayOfTheWeek]}, ${months[currentMonth]} ${selectedDayOfTheMonth} ${currentYear}`}
+          {`${weekdays[currentDayOfTheWeek]}, ${months[selectedMonth]} ${selectedDayOfTheMonth} ${selectedYear}`}
         </Text>
-        <Button title="Today" defaultSelected />
+        {!isYearMonthPickerVisible ? (
+          <Button title="Today" defaultSelected />
+        ) : (
+          <Button title="Set date" defaultSelected />
+        )}
       </View>
     </View>
   );
@@ -213,7 +227,6 @@ const DAY_LABEL_SIZE = 40;
 const styles = StyleSheet.create({
   container: {
     width: 350,
-    height: 450,
     gap: 10,
     padding: 20,
     paddingBottom: 30,
@@ -244,7 +257,7 @@ const styles = StyleSheet.create({
     // paddingHorizontal: 20,
   },
   calendarContainer: {
-    flex: 1,
+    height: 300,
     // marginVertical: 30,
     // marginHorizontal: 20,
     flexDirection: 'column',
@@ -288,6 +301,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 20,
+    gap: 10,
+    flexGrow: 1,
   },
 });

@@ -7,7 +7,7 @@ type ComponentName =
   | 'DatePickerStyle2'
   | 'DatePickerStyle2';
 
-type DateSelectType = 'single' | 'multiple' | 'range';
+type DateSelectType = 'single' | 'multiple'; // | 'range';
 
 type DatePickerProps = {
   componentName: ComponentName;
@@ -16,6 +16,7 @@ type DatePickerProps = {
   withModal?: boolean;
   onResponse: (date: number) => void;
   dateSelectType?: DateSelectType;
+  defaultDateValue?: number;
 };
 
 type StylesLookupProps = {
@@ -38,6 +39,7 @@ const DatePicker = (props: DatePickerProps) => {
     onModalClose,
     onResponse,
     dateSelectType = 'single',
+    defaultDateValue = 1729976400000,
   } = props;
   const Component = StylesLookup[componentName];
 
@@ -63,7 +65,7 @@ const DatePicker = (props: DatePickerProps) => {
       <Component
         calendarSelectType={dateSelectType}
         onResponse={onResponse}
-        defaultDate={1729976400000}
+        defaultDate={defaultDateValue}
       />
     </ModalManager>
   );

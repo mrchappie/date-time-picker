@@ -60,6 +60,23 @@ export function generateDaysToDisplay(
   return newDays;
 }
 
+export function formatDate(date: number) {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  };
+  return new Date(date).toLocaleDateString('en-US', options);
+}
+
+export function formatTime(time: number) {
+  const formatedTime = `${Math.floor(time / 3600)}:${Math.floor(
+    (time % 3600) / 60
+  )}`;
+  return formatedTime;
+}
+
 export type MonthInfo = {
   year: number;
   month: {

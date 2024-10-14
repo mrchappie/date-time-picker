@@ -27,7 +27,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: 'black',
     flex: 1,
-    minWidth: 80,
+    minWidth: 100,
+    maxWidth: 150,
   },
   title: {
     textAlign: 'center',

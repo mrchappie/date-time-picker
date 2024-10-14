@@ -4,19 +4,26 @@ import { getMonthData, months } from '../utils';
 
 type MonthPickerProps = {
   currentMonth: number;
+  onChange: (monthIndex: number) => void;
 };
 const ITEM_HEIGHT = 40;
-
 const monthsArray = [...months];
 
 const MonthPicker = (props: MonthPickerProps) => {
-  // const { currentMonth } = props;
-  const [month, setMonth] = useState<number>(props.currentMonth);
+  const { currentMonth, onChange } = props;
+  const [month, setMonth] = useState<number>(currentMonth);
   function renderItem({ item }: { item: string }) {
     const isSelected = monthsArray.indexOf(item) === month;
+
     return (
       <Text style={[styles.month, isSelected && styles.selected]}>{item}</Text>
     );
+  }
+
+  function handleSelectedMonth(monthIndex: number) {
+    // add two to set the centered month
+    onChange(monthIndex + 2);
+    setMonth(monthIndex + 2);
   }
 
   return (
@@ -24,7 +31,8 @@ const MonthPicker = (props: MonthPickerProps) => {
       <FlatList
         data={monthsArray}
         renderItem={renderItem}
-        keyExtractor={(item) => item.toString()}
+        keyExtractor={(_, index) => index.toString()}
+        showsVerticalScrollIndicator={false}
         initialScrollIndex={month}
         snapToInterval={ITEM_HEIGHT}
         getItemLayout={(_, index) => ({
@@ -37,7 +45,8 @@ const MonthPicker = (props: MonthPickerProps) => {
           const index = Math.round(
             event.nativeEvent.contentOffset.y / ITEM_HEIGHT
           );
-          setMonth(index);
+
+          handleSelectedMonth(index);
         }}
       />
     </View>
@@ -57,13 +66,13 @@ const styles = StyleSheet.create({
   },
   month: {
     color: 'black',
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: '900',
     paddingHorizontal: 20,
     height: ITEM_HEIGHT,
+    textAlignVertical: 'center',
   },
   selected: {
-    color: 'blue',
-    backgroundColor: 'yellow',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
   },
 });
