@@ -64,7 +64,7 @@ const MinutesPicker: React.FC<MinutesPickerProps> = (props) => {
         }}
         onEndReachedThreshold={5}
         onScroll={(event) => {
-          console.log(event.nativeEvent.contentOffset.y < ITEM_HEIGHT);
+          // console.log(event.nativeEvent.contentOffset.y < ITEM_HEIGHT);
         }}
       />
     </View>

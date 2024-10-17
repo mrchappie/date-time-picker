@@ -64,7 +64,9 @@ const TimePickerStyle1: React.FC<TimePickerStyle1Props> = ({
           title="Set Time"
           defaultSelected
           onButtonPress={() => {
-            onResponse(selectedHour * 3600 + selectedMinutes * 60);
+            const SELECTED_TIME_IN_MILLISECONDS =
+              ((selectedHour - 2) * 3600 + selectedMinutes * 60) * 1000;
+            onResponse(SELECTED_TIME_IN_MILLISECONDS);
           }}
         />
       </View>
