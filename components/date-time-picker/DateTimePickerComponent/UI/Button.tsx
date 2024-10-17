@@ -12,7 +12,10 @@ const Button = (props: Props) => {
   return (
     <Pressable
       onPress={onButtonPress}
-      style={{ ...styles.button, opacity: !defaultSelected ? 0.75 : 1 }}
+      style={({ pressed }) => [
+        styles.button,
+        { opacity: pressed ? 0.6 : defaultSelected ? 1 : 0.75 },
+      ]}
     >
       <Text style={styles.title}>{title}</Text>
     </Pressable>
@@ -26,13 +29,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10,
     backgroundColor: 'black',
-    flex: 1,
     minWidth: 100,
     maxWidth: 150,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 5,
   },
   title: {
     textAlign: 'center',
     userSelect: 'none',
     color: 'white',
+    fontWeight: '600',
   },
 });

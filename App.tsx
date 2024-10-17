@@ -7,12 +7,15 @@ import {
   formatDate,
   formatTime,
 } from './components/date-time-picker/DateTimePickerComponent/utils';
+import IntervalPicker from './components/date-time-picker/DateTimePickerComponent/IntervalPicker';
 
 export default function App() {
   const [isDatePickerVisible, setIsDatePickerVisible] =
     useState<boolean>(false);
   const [isTimePickerVisible, setIsTimePickerVisible] =
     useState<boolean>(false);
+  const [isIntervalPickerVisible, setIsIntervalPickerVisible] =
+    useState<boolean>(true);
 
   const [date, setDate] = useState<number>(new Date('2024-10-17').getTime());
   const [time, setTime] = useState<number>(0);
@@ -42,6 +45,12 @@ export default function App() {
           setIsTimePickerVisible(true);
         }}
       />
+      <Button
+        title="Open Interval Picker"
+        onPress={() => {
+          setIsIntervalPickerVisible(true);
+        }}
+      />
       <DatePicker
         componentName="DatePickerStyle1"
         isModalVisible={isDatePickerVisible}
@@ -58,12 +67,22 @@ export default function App() {
       <TimePicker
         componentName="TimePickerStyle1"
         isModalVisible={isTimePickerVisible}
-        handleModalClose={() => {
+        onModalClose={() => {
           setIsTimePickerVisible(false);
         }}
         onResponse={(time) => {
           setIsTimePickerVisible(false);
           setTime(time);
+        }}
+      />
+      <IntervalPicker
+        componentName="IntervalPickerStyle1"
+        isModalVisible={isIntervalPickerVisible}
+        onModalClose={() => {
+          setIsIntervalPickerVisible(false);
+        }}
+        onResponse={(interval) => {
+          console.log(interval);
         }}
       />
     </View>

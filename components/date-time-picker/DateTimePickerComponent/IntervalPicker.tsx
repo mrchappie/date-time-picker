@@ -1,39 +1,40 @@
 import { Text, View } from 'react-native';
-import TimePickerStyle1 from '../styles/TimePickerStyle1';
+import IntervalPickerStyle1 from '../styles/IntervalPickerStyle1';
 import ModalManager from './UI/ModalManager';
 
-type StylesLookupProps = {
-  [key: string]: React.ComponentType<{
-    onResponse: (time: number) => void;
-    defaultTime?: number;
-  }>;
-};
-
-const StylesLookup: StylesLookupProps = {
-  TimePickerStyle1: TimePickerStyle1,
-};
-
 type ComponentName =
-  | 'TimePickerStyle1'
-  | 'TimePickerStyle2'
-  | 'TimePickerStyle2';
+  | 'IntervalPickerStyle1'
+  | 'IntervalPickerStyle2'
+  | 'IntervalPickerStyle2';
 
-type TimePickerProps = {
+type IntervalPickerProps = {
   componentName: ComponentName;
   onModalClose: () => void;
   isModalVisible?: boolean;
   withModal?: boolean;
-  onResponse: (time: number) => void;
-  onHandleResponse?: () => void;
+  onResponse: (date: number) => void;
+  defaultDateValue?: number;
 };
 
-const TimePicker = (props: TimePickerProps) => {
+type StylesLookupProps = {
+  [key: string]: React.ComponentType<{
+    onResponse: (date: number) => void;
+    defaultDate?: number;
+  }>;
+};
+
+const StylesLookup: StylesLookupProps = {
+  IntervalPickerStyle1: IntervalPickerStyle1,
+};
+
+const IntervalPicker = (props: IntervalPickerProps) => {
   const {
     componentName,
     isModalVisible = false,
     withModal = true,
     onModalClose,
     onResponse,
+    defaultDateValue = 1729976400000,
   } = props;
   const Component = StylesLookup[componentName];
 
@@ -54,9 +55,9 @@ const TimePicker = (props: TimePickerProps) => {
   // return component with modal
   return (
     <ModalManager visible={isModalVisible} onCloseModal={onModalClose}>
-      <Component onResponse={onResponse} />
+      <Component onResponse={onResponse} defaultDate={defaultDateValue} />
     </ModalManager>
   );
 };
 
-export default TimePicker;
+export default IntervalPicker;
