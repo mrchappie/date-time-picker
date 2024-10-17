@@ -71,9 +71,13 @@ export function formatDate(date: number) {
 }
 
 export function formatTime(time: number) {
-  const formatedTime = `${Math.floor(time / 3600)}:${Math.floor(
-    (time % 3600) / 60
-  )}`;
+  const hour = Math.floor(time / 1000 / 3600);
+  const minutes = Math.floor(((time / 1000) % 3600) / 60);
+
+  const formatedTime: string = `${hour > 10 ? hour : `0${hour}`}:${
+    minutes > 10 ? minutes : `0${minutes}`
+  }`;
+
   return formatedTime;
 }
 
