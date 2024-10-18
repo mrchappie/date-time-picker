@@ -81,6 +81,19 @@ export function formatTime(time: number) {
   return formatedTime;
 }
 
+export function formatIntervalHeading(
+  numOfOcc: number,
+  repeatValue: string
+): string {
+  switch (true) {
+    case numOfOcc === 2 && repeatValue === 'Once':
+      return '';
+
+    default:
+      return `You will get ${numOfOcc} notification only once`;
+  }
+}
+
 export type MonthInfo = {
   year: number;
   month: {
