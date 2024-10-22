@@ -81,18 +81,18 @@ export function formatTime(time: number) {
   return formatedTime;
 }
 
-export function formatIntervalHeading(
-  numOfOcc: number,
-  repeatValue: string
-): string {
-  switch (true) {
-    case numOfOcc === 2 && repeatValue === 'Once':
-      return '';
-
-    default:
-      return `You will get ${numOfOcc} notification only once`;
-  }
+export function formatIntervalHeading(repeatValue: string): string {
+  return intervalHeadingCasesMap[repeatValue];
 }
+
+const intervalHeadingCasesMap: { [key: string]: string } = {
+  Once: 'today',
+  Daily: 'every day',
+  'Mon to Fri': 'from Mon to Fri',
+  Weekend: 'on weekend days',
+  '1st of the Month': 'on the first day of the month',
+  'Last of the month': 'on the last day of month',
+};
 
 export type MonthInfo = {
   year: number;

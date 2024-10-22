@@ -1,11 +1,11 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   DayInfo,
   generateDaysToDisplay,
   months,
   weekdays,
-} from '../DateTimePickerComponent/utils';
+} from '../DateTimePickerComponent/utils/utils';
 import Button from '../DateTimePickerComponent/UI/Button';
 import MonthPicker from '../DateTimePickerComponent/UI/MontPicker';
 import YearPicker from '../DateTimePickerComponent/UI/YearPicker';

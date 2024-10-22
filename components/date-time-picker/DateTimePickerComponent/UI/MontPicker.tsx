@@ -1,6 +1,6 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
-import { getMonthData, months } from '../utils';
+import { getMonthData, months } from '../utils/utils';
 
 type MonthPickerProps = {
   currentMonth: number;

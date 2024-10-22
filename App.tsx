@@ -6,7 +6,7 @@ import TimePicker from './components/date-time-picker/DateTimePickerComponent/Ti
 import {
   formatDate,
   formatTime,
-} from './components/date-time-picker/DateTimePickerComponent/utils';
+} from './components/date-time-picker/DateTimePickerComponent/utils/utils';
 import IntervalPicker from './components/date-time-picker/DateTimePickerComponent/IntervalPicker';
 
 export default function App() {
@@ -19,6 +19,7 @@ export default function App() {
 
   const [date, setDate] = useState<number>(new Date('2024-10-17').getTime());
   const [time, setTime] = useState<number>(0);
+  const [interval, setInterval] = useState<any>(0);
 
   useEffect(() => {
     const hours = new Date().getHours();
@@ -32,6 +33,8 @@ export default function App() {
     <View style={styles.container}>
       <Text style={{ color: '#fff' }}>{formatDate(date)}</Text>
       <Text style={{ color: '#fff' }}>{formatTime(time)}</Text>
+      <Text style={{ color: '#fff' }}>{formatDate(interval.date)}</Text>
+      <Text style={{ color: '#fff' }}>{interval.numOfOcc}</Text>
       <StatusBar style="auto" />
       <Button
         title="Open Date Picker"
@@ -82,7 +85,7 @@ export default function App() {
           setIsIntervalPickerVisible(false);
         }}
         onResponse={(interval) => {
-          console.log(interval);
+          setInterval(interval);
         }}
       />
     </View>
