@@ -81,18 +81,26 @@ export function formatTime(time: number) {
   return formatedTime;
 }
 
-export function formatIntervalHeading(repeatValue: string): string {
-  return intervalHeadingCasesMap[repeatValue];
-}
-
-const intervalHeadingCasesMap: { [key: string]: string } = {
-  Once: 'today',
-  Daily: 'every day',
-  'Mon to Fri': 'from Mon to Fri',
-  Weekend: 'on weekend days',
-  '1st of the Month': 'on the first day of the month',
-  'Last of the month': 'on the last day of month',
-};
+export const basicRepeatOptions: RepeatProps[] = [
+  { id: '1', repeatValue: 'Once', heading: 'today' },
+  { id: '2', repeatValue: 'Daily', heading: 'every day' },
+  { id: '3', repeatValue: 'Mon to Fri', heading: 'from Mon to Fri' },
+  { id: '4', repeatValue: 'Weekend', heading: 'on weekend days' },
+  { id: '5', repeatValue: 'Custom', heading: '' },
+];
+export const advancedRepeatOptions: RepeatProps[] = [
+  {
+    id: '10',
+    repeatValue: '1st of the Month',
+    heading: 'on the first day of the month',
+  },
+  {
+    id: '11',
+    repeatValue: 'Last of the month',
+    heading: 'on the last day of month',
+  },
+  { id: '12', repeatValue: 'Custom', heading: '' },
+];
 
 export type MonthInfo = {
   year: number;
@@ -114,3 +122,9 @@ export function getMonthData(currentMonth: number) {
 
   return months.slice(start, end + 1); // Get the 7 months to display
 }
+
+export type RepeatProps = {
+  id: string;
+  repeatValue: string;
+  heading: string;
+};

@@ -2,32 +2,14 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
 import DatePicker from '../DateTimePickerComponent/DatePicker';
 import Button from '../DateTimePickerComponent/UI/Button';
-import { formatIntervalHeading } from '../DateTimePickerComponent/utils/utils';
+import {
+  advancedRepeatOptions,
+  basicRepeatOptions,
+  RepeatProps,
+} from '../DateTimePickerComponent/utils/utils';
 import StringToDate from '../DateTimePickerComponent/utils/stringToDateClass';
 
 const ST = new StringToDate();
-
-const basicRepeatOptions = [
-  { repeatValue: 'Once' },
-  { repeatValue: 'Daily' },
-  { repeatValue: 'Mon to Fri' },
-  { repeatValue: 'Weekend' },
-  { repeatValue: 'Custom' },
-].map((item) => {
-  return { ...item, id: 'basic' + item.repeatValue.replaceAll(' ', '_') };
-});
-const advancedRepeatOptions = [
-  { repeatValue: '1st of the Month' },
-  { repeatValue: 'Last of the month' },
-  { repeatValue: 'Custom' },
-].map((item) => {
-  return { ...item, id: 'advanced' + item.repeatValue.replaceAll(' ', '_') };
-});
-
-type RepeatProps = {
-  id: string;
-  repeatValue: string;
-};
 
 type BasicReapeatProps = RepeatProps;
 type AdvancedReapeatProps = RepeatProps;
@@ -43,8 +25,9 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
   const [isDatePickerModalOpen, setIsDatePickerModalOpen] =
     useState<boolean>(false);
   const [repeatOption, setRepeatOption] = useState<RepeatProps | undefined>({
-    id: 'basicOnce',
+    id: '1',
     repeatValue: 'Once',
+    heading: 'today',
   });
   const [numOfOccurences, setNumOfOccurences] = useState<number>(1);
   const [selectedCustomDates, setSelectedCustomDates] = useState<string[]>([]);
@@ -67,6 +50,7 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
         return {
           id: id,
           repeatValue: repeatOption.repeatValue,
+          heading: repeatOption.heading,
         };
       }
       return prevState;
@@ -89,6 +73,7 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
       <Pressable
         onPress={() => {
           handleSelectRepeatOption(item, id);
+          console.log(ST.getRepeatInterval(item.id));
         }}
       >
         <Text style={[styles.picker, { opacity: isSelected ? 1 : 0.5 }]}>
@@ -128,7 +113,7 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
         <Text style={styles.heading}>
           You will get {numOfOccurences}{' '}
           {numOfOccurences === 1 ? 'notification ' : 'notifications '}
-          {formatIntervalHeading(repeatOption?.repeatValue)}
+          {repeatOption?.heading}
         </Text>
       )}
       <View style={styles.insideContainer}>
