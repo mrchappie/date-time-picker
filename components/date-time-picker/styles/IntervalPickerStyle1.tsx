@@ -5,11 +5,11 @@ import Button from '../DateTimePickerComponent/UI/Button';
 import {
   advancedRepeatOptions,
   basicRepeatOptions,
+  moreAdvancedRepeatOptions,
+  moreBasicRepeatOptions,
   RepeatProps,
 } from '../DateTimePickerComponent/utils/utils';
-import StringToDate from '../DateTimePickerComponent/utils/stringToDateClass';
-
-const ST = new StringToDate();
+import useSetRepeatOptionValue from '../DateTimePickerComponent/utils/useSetRepeatOptionValue';
 
 type BasicReapeatProps = RepeatProps;
 type AdvancedReapeatProps = RepeatProps;
@@ -19,18 +19,24 @@ type IntervalPickerStyle1 = {
   onResponse: (data: { date: number; numOfOcc: number }) => void;
 };
 
+const defaultRepeatOption = basicRepeatOptions[0];
+
 const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
   const { onResponse } = props;
 
   const [isDatePickerModalOpen, setIsDatePickerModalOpen] =
     useState<boolean>(false);
-  const [repeatOption, setRepeatOption] = useState<RepeatProps | undefined>({
-    id: '1',
-    repeatValue: 'Once',
-    heading: 'today',
-  });
+  const [repeatOption, setRepeatOption] = useState<RepeatProps[]>([
+    defaultRepeatOption,
+  ]);
   const [numOfOccurences, setNumOfOccurences] = useState<number>(1);
   const [selectedCustomDates, setSelectedCustomDates] = useState<string[]>([]);
+  const [showMoreRepeatOptions, setShowMoreRepeatOptions] = useState<
+    string | undefined
+  >('');
+
+  const { getRepeatInterval, resetSelectedMoreRepeatOptions, timeInMs } =
+    useSetRepeatOptionValue();
 
   function handleSetSelectedDates(dateInMs: number) {
     const dateAsString = new Date(dateInMs).toLocaleDateString('en-US', {
@@ -40,43 +46,66 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
       day: 'numeric',
     });
     setSelectedCustomDates([dateAsString]);
-    setRepeatOption(undefined);
+    setRepeatOption([defaultRepeatOption]);
     setIsDatePickerModalOpen(false);
   }
 
-  function handleSelectRepeatOption(repeatOption: RepeatProps, id: string) {
+  function handleSelectRepeatOption(repeatOption: RepeatProps) {
     setRepeatOption((prevState) => {
-      if (prevState?.id !== repeatOption.id) {
-        return {
-          id: id,
-          repeatValue: repeatOption.repeatValue,
-          heading: repeatOption.heading,
-        };
+      if (prevState[0]?.id !== repeatOption.id && !showMoreRepeatOptions) {
+        return [repeatOption];
       }
-      return prevState;
+
+      if (showMoreRepeatOptions) {
+        const isRepeatOptionSelected = prevState?.some((repOpt) => {
+          return repOpt.id === repeatOption.id;
+        });
+        if (isRepeatOptionSelected) {
+          return [
+            ...prevState.filter((repOpt) => {
+              return repOpt.id != repeatOption.id;
+            }),
+          ];
+        } else {
+          return [...prevState, repeatOption];
+        }
+      }
+      return [];
     });
     setSelectedCustomDates([]);
   }
 
   function handleSaveIntervalButton() {
     if (repeatOption) {
-      onResponse({ date: ST.timeInMs, numOfOcc: numOfOccurences });
+      onResponse({ date: timeInMs(), numOfOcc: numOfOccurences });
     } else {
-      console.log(selectedCustomDates);
+      console.log(selectedCustomDates, 'here 2');
     }
   }
 
-  function renderRepeatType(item: RepeatProps, id: string) {
-    const isSelected = item.id === repeatOption?.id;
+  function renderRepeatType(item: RepeatProps, id: number) {
+    const isSelected = repeatOption.some(
+      (repeatOption) => repeatOption.id === item.id
+    );
 
     return (
       <Pressable
         onPress={() => {
-          handleSelectRepeatOption(item, id);
-          console.log(ST.getRepeatInterval(item.id));
+          if (id === 11) {
+            setShowMoreRepeatOptions('basic');
+            return;
+          }
+          if (id === 22) {
+            setShowMoreRepeatOptions('advanced');
+            return;
+          }
+
+          handleSelectRepeatOption(item);
+
+          console.log(getRepeatInterval(item), 'here');
         }}
       >
-        <Text style={[styles.picker, { opacity: isSelected ? 1 : 0.5 }]}>
+        <Text style={[styles.picker, !isSelected && styles.isSelected]}>
           {item.repeatValue}
         </Text>
       </Pressable>
@@ -86,6 +115,27 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
   function renderSelectedCustomDates(item: string) {
     return <Text style={styles.customSelectedDate}>{item}</Text>;
   }
+
+  function renderMoreRepeatOptions(item: RepeatProps) {
+    const isSelected = repeatOption.some(
+      (repeatOption) => repeatOption.id === item.id
+    );
+    return (
+      <Pressable
+        onPress={() => {
+          handleSelectRepeatOption(item);
+          console.log(getRepeatInterval(item), 'here 3');
+        }}
+      >
+        <Text
+          style={[styles.moreRepeatOption, !isSelected && styles.isSelected]}
+        >
+          {item.repeatValue}
+        </Text>
+      </Pressable>
+    );
+  }
+
   function renderOccurance(item: number) {
     const isSelected = item === numOfOccurences;
 
@@ -100,7 +150,7 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
           });
         }}
       >
-        <Text style={[styles.picker, { opacity: isSelected ? 1 : 0.5 }]}>
+        <Text style={[styles.picker, !isSelected && styles.isSelected]}>
           {item}
         </Text>
       </Pressable>
@@ -108,75 +158,104 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
   }
 
   return (
-    <View style={styles.container}>
-      {repeatOption && (
-        <Text style={styles.heading}>
-          You will get {numOfOccurences}{' '}
-          {numOfOccurences === 1 ? 'notification ' : 'notifications '}
-          {repeatOption?.heading}
-        </Text>
-      )}
-      <View style={styles.insideContainer}>
-        <Text style={styles.label}>Basic Repeat</Text>
-        <FlatList
-          data={basicRepeatOptions}
-          renderItem={({ item }) => renderRepeatType(item, item.id)}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 10 }}
-        />
-      </View>
-      <View style={styles.insideContainer}>
-        <Text style={styles.label}>Advanced Repeat</Text>
-        <FlatList
-          data={advancedRepeatOptions}
-          renderItem={({ item }) => renderRepeatType(item, item.id)}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 10 }}
-        />
-      </View>
-      <View style={styles.insideContainer}>
-        <Text style={styles.label}>Custom Repeat</Text>
-        <Button
-          title="Open Calendar"
-          defaultSelected
-          onButtonPress={() => {
-            setIsDatePickerModalOpen(true);
-          }}
-        />
-        <DatePicker
-          componentName="DatePickerStyle1"
-          isModalVisible={isDatePickerModalOpen}
-          onModalClose={() => {
-            setIsDatePickerModalOpen(false);
-          }}
-          onResponse={(response) => handleSetSelectedDates(response)}
-        />
-        <FlatList
-          data={selectedCustomDates}
-          renderItem={({ item }) => renderSelectedCustomDates(item)}
-          numColumns={3}
-          contentContainerStyle={{ paddingTop: 10, gap: 10 }}
-          columnWrapperStyle={{ gap: 10 }}
-        />
-      </View>
-      <View style={styles.insideContainer}>
-        <Text style={styles.label}>End after num. of occurences</Text>
-        <FlatList
-          data={[1, 2, 3, 4, 5]}
-          renderItem={({ item }) => renderOccurance(item)}
-          horizontal
-          contentContainerStyle={{ gap: 10 }}
-        />
-      </View>
+    <>
+      {!showMoreRepeatOptions && (
+        <View style={styles.container}>
+          {repeatOption && (
+            <Text style={styles.heading}>
+              You will get {numOfOccurences}{' '}
+              {numOfOccurences === 1 ? 'notification ' : 'notifications '}
+              {repeatOption[0]?.heading}
+            </Text>
+          )}
+          <View style={styles.insideContainer}>
+            <Text style={styles.label}>Basic Repeat</Text>
+            <FlatList
+              data={basicRepeatOptions}
+              numColumns={4}
+              renderItem={({ item }) => renderRepeatType(item, item.id)}
+              // horizontal
+              // showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 10 }}
+              columnWrapperStyle={{ gap: 10 }}
+            />
+          </View>
+          <View style={styles.insideContainer}>
+            <Text style={styles.label}>Advanced Repeat</Text>
+            <FlatList
+              data={advancedRepeatOptions}
+              renderItem={({ item }) => renderRepeatType(item, item.id)}
+              numColumns={2}
+              // horizontal
+              // showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 10 }}
+              columnWrapperStyle={{ gap: 10 }}
+            />
+          </View>
+          <View style={styles.insideContainer}>
+            <Text style={styles.label}>Custom Repeat</Text>
+            <Button
+              title="Open Calendar"
+              defaultSelected
+              onButtonPress={() => {
+                setIsDatePickerModalOpen(true);
+              }}
+            />
+            <DatePicker
+              componentName="DatePickerStyle1"
+              isModalVisible={isDatePickerModalOpen}
+              onModalClose={() => {
+                setIsDatePickerModalOpen(false);
+              }}
+              onResponse={(response) => handleSetSelectedDates(response)}
+            />
+            <FlatList
+              data={selectedCustomDates}
+              renderItem={({ item }) => renderSelectedCustomDates(item)}
+              numColumns={3}
+              contentContainerStyle={{ paddingTop: 10, gap: 10 }}
+              columnWrapperStyle={{ gap: 10 }}
+            />
+          </View>
+          <View style={styles.insideContainer}>
+            <Text style={styles.label}>End after num. of occurences</Text>
+            <FlatList
+              data={[1, 2, 3, 4, 5]}
+              renderItem={({ item }) => renderOccurance(item)}
+              horizontal
+              contentContainerStyle={{ gap: 10 }}
+            />
+          </View>
 
-      <Button
-        title="Save Interval"
-        defaultSelected
-        onButtonPress={handleSaveIntervalButton}
-      />
-    </View>
+          <Button
+            title="Save Interval"
+            defaultSelected
+            onButtonPress={handleSaveIntervalButton}
+          />
+        </View>
+      )}
+      {showMoreRepeatOptions && (
+        <View style={styles.container}>
+          <FlatList
+            data={
+              showMoreRepeatOptions === 'basic'
+                ? moreBasicRepeatOptions
+                : moreAdvancedRepeatOptions
+            }
+            renderItem={({ item }) => renderMoreRepeatOptions(item)}
+            contentContainerStyle={{ gap: 10 }}
+          />
+          <Button
+            title="Save"
+            defaultSelected
+            onButtonPress={() => {
+              setShowMoreRepeatOptions(undefined);
+              resetSelectedMoreRepeatOptions();
+            }}
+          />
+        </View>
+      )}
+    </>
   );
 };
 
@@ -228,5 +307,18 @@ const styles = StyleSheet.create({
 
     textAlign: 'center',
     textAlignVertical: 'center',
+  },
+  isSelected: {
+    opacity: 0.5,
+  },
+  moreRepeatOption: {
+    backgroundColor: 'black',
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '600',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    textAlign: 'center',
+    borderRadius: 5,
   },
 });

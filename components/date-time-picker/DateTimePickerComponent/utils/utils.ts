@@ -82,24 +82,92 @@ export function formatTime(time: number) {
 }
 
 export const basicRepeatOptions: RepeatProps[] = [
-  { id: '1', repeatValue: 'Once', heading: 'today' },
-  { id: '2', repeatValue: 'Daily', heading: 'every day' },
-  { id: '3', repeatValue: 'Mon to Fri', heading: 'from Mon to Fri' },
-  { id: '4', repeatValue: 'Weekend', heading: 'on weekend days' },
-  { id: '5', repeatValue: 'Custom', heading: '' },
+  { id: 7, repeatValue: 'Once', heading: 'today', value: [] },
+  {
+    id: 8,
+    repeatValue: 'Daily',
+    heading: 'every day',
+    value: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
+    id: 9,
+    repeatValue: 'Mon to Fri',
+    heading: 'from Mon to Fri',
+    value: [1, 2, 3, 4, 5],
+  },
+  { id: 10, repeatValue: 'Weekend', heading: 'on weekend days', value: [6, 0] },
+  {
+    id: 29,
+    repeatValue: 'Monthly',
+    heading: 'on the same day every month',
+    value: [],
+  },
+  { id: 11, repeatValue: 'More', heading: '', value: [] },
+];
+export const moreBasicRepeatOptions: RepeatProps[] = [
+  { id: 0, repeatValue: 'Sunday', heading: 'on Sunday', value: [0] },
+  { id: 1, repeatValue: 'Monday', heading: 'on Monday', value: [1] },
+  { id: 2, repeatValue: 'Tuesday', heading: 'on Tuesday', value: [2] },
+  { id: 3, repeatValue: 'Wednesday', heading: 'on Wednesday', value: [3] },
+  { id: 4, repeatValue: 'Thursday', heading: 'on Thursday', value: [4] },
+  { id: 5, repeatValue: 'Friday', heading: 'on Friday', value: [5] },
+  { id: 6, repeatValue: 'Saturday', heading: 'on Saturday', value: [6] },
 ];
 export const advancedRepeatOptions: RepeatProps[] = [
   {
-    id: '10',
+    id: 20,
     repeatValue: '1st of the Month',
     heading: 'on the first day of the month',
+    value: [1],
   },
   {
-    id: '11',
+    id: 25,
+    repeatValue: '15th of the Month',
+    heading: 'on the 15th day of the month',
+    value: [15],
+  },
+  {
+    id: 21,
     repeatValue: 'Last of the month',
     heading: 'on the last day of month',
+    value: [],
   },
-  { id: '12', repeatValue: 'Custom', heading: '' },
+  { id: 22, repeatValue: 'More', heading: '', value: [] },
+];
+
+export const moreAdvancedRepeatOptions: RepeatProps[] = [
+  {
+    id: 23,
+    repeatValue: '5th of the Month',
+    heading: 'on the 5th day of the month',
+    value: [5],
+  },
+  {
+    id: 24,
+    repeatValue: '10th of the Month',
+    heading: 'on the 10th day of the month',
+    value: [10],
+  },
+
+  {
+    id: 27,
+    repeatValue: '20th of the Month',
+    heading: 'on the 20th day of the month',
+    value: [20],
+  },
+  {
+    id: 28,
+    repeatValue: '25th of the Month',
+    heading: 'on the 25th day of the month',
+    value: [25],
+  },
+
+  {
+    id: 31,
+    repeatValue: 'Yearly',
+    heading: 'on the same date every year',
+    value: [],
+  },
 ];
 
 export type MonthInfo = {
@@ -124,7 +192,8 @@ export function getMonthData(currentMonth: number) {
 }
 
 export type RepeatProps = {
-  id: string;
+  id: number;
   repeatValue: string;
   heading: string;
+  value: number[];
 };
