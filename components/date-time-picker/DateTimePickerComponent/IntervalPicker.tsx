@@ -12,13 +12,13 @@ type IntervalPickerProps = {
   onModalClose: () => void;
   isModalVisible?: boolean;
   withModal?: boolean;
-  onResponse: (data: { date: number; numOfOcc: number }) => void;
+  onResponse: (data: { whenToRepeat: any; numOfOcc: number }) => void;
   defaultDateValue?: number;
 };
 
 type StylesLookupProps = {
   [key: string]: React.ComponentType<{
-    onResponse: (data: { date: number; numOfOcc: number }) => void;
+    onResponse: (data: { whenToRepeat: any; numOfOcc: number }) => void;
     defaultDate?: number;
   }>;
 };

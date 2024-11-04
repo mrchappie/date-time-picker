@@ -102,7 +102,7 @@ export const basicRepeatOptions: RepeatProps[] = [
     heading: 'on the same day every month',
     value: [],
   },
-  { id: 11, repeatValue: 'More', heading: '', value: [] },
+  { id: 11, repeatValue: 'Custom', heading: '', value: [] },
 ];
 export const moreBasicRepeatOptions: RepeatProps[] = [
   { id: 0, repeatValue: 'Sunday', heading: 'on Sunday', value: [0] },
@@ -170,6 +170,14 @@ export const moreAdvancedRepeatOptions: RepeatProps[] = [
   },
 ];
 
+export function getMonthData(currentMonth: number) {
+  // Select 7 months centered around the current month
+  const start = Math.max(currentMonth - 2, 0); // Ensure no negative index
+  const end = Math.min(currentMonth + 2, months.length - 1); // Ensure no overflow
+
+  return months.slice(start, end + 1); // Get the 7 months to display
+}
+
 export type MonthInfo = {
   year: number;
   month: {
@@ -182,14 +190,6 @@ export type MonthInfo = {
   days: { dayNumber: number; hideDayBox: boolean }[];
 };
 export type DayInfo = MonthInfo['days'][number];
-
-export function getMonthData(currentMonth: number) {
-  // Select 7 months centered around the current month
-  const start = Math.max(currentMonth - 2, 0); // Ensure no negative index
-  const end = Math.min(currentMonth + 2, months.length - 1); // Ensure no overflow
-
-  return months.slice(start, end + 1); // Get the 7 months to display
-}
 
 export type RepeatProps = {
   id: number;

@@ -1,5 +1,5 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DatePicker from '../DateTimePickerComponent/DatePicker';
 import Button from '../DateTimePickerComponent/UI/Button';
 import {
@@ -16,7 +16,7 @@ type AdvancedReapeatProps = RepeatProps;
 type CustomReapeatProps = RepeatProps;
 
 type IntervalPickerStyle1 = {
-  onResponse: (data: { date: number; numOfOcc: number }) => void;
+  onResponse: (data: { whenToRepeat: any; numOfOcc: number }) => void;
 };
 
 const defaultRepeatOption = basicRepeatOptions[0];
@@ -56,6 +56,10 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
         return [repeatOption];
       }
 
+      if (prevState[0]?.id === repeatOption.id && !showMoreRepeatOptions) {
+        return prevState;
+      }
+
       if (showMoreRepeatOptions) {
         const isRepeatOptionSelected = prevState?.some((repOpt) => {
           return repOpt.id === repeatOption.id;
@@ -77,14 +81,14 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
 
   function handleSaveIntervalButton() {
     if (repeatOption) {
-      onResponse({ date: timeInMs(), numOfOcc: numOfOccurences });
+      onResponse({ whenToRepeat: repeatOption, numOfOcc: numOfOccurences });
     } else {
       console.log(selectedCustomDates, 'here 2');
     }
   }
 
   function renderRepeatType(item: RepeatProps, id: number) {
-    const isSelected = repeatOption.some(
+    let isSelected = repeatOption.some(
       (repeatOption) => repeatOption.id === item.id
     );
 
@@ -93,16 +97,18 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
         onPress={() => {
           if (id === 11) {
             setShowMoreRepeatOptions('basic');
-            return;
+            // setRepeatOption([]);
+            // return;
           }
           if (id === 22) {
             setShowMoreRepeatOptions('advanced');
-            return;
+            // setRepeatOption([]);
+            // return;
           }
 
           handleSelectRepeatOption(item);
 
-          console.log(getRepeatInterval(item), 'here');
+          // console.log(getRepeatInterval(item), 'here');
         }}
       >
         <Text style={[styles.picker, !isSelected && styles.isSelected]}>
@@ -116,6 +122,10 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
     return <Text style={styles.customSelectedDate}>{item}</Text>;
   }
 
+  useEffect(() => {
+    console.log(repeatOption, 'here 3');
+  }, [repeatOption]);
+
   function renderMoreRepeatOptions(item: RepeatProps) {
     const isSelected = repeatOption.some(
       (repeatOption) => repeatOption.id === item.id
@@ -124,7 +134,7 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
       <Pressable
         onPress={() => {
           handleSelectRepeatOption(item);
-          console.log(getRepeatInterval(item), 'here 3');
+          // console.log(getRepeatInterval(item), 'here 3');
         }}
       >
         <Text
@@ -165,7 +175,10 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
             <Text style={styles.heading}>
               You will get {numOfOccurences}{' '}
               {numOfOccurences === 1 ? 'notification ' : 'notifications '}
-              {repeatOption[0]?.heading}
+              {repeatOption
+                .filter(({ id }) => id != 11 && id != 22)
+                .map(({ heading }) => heading)
+                .join(', ')}
             </Text>
           )}
           <View style={styles.insideContainer}>
@@ -249,7 +262,7 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
             title="Save"
             defaultSelected
             onButtonPress={() => {
-              setShowMoreRepeatOptions(undefined);
+              setShowMoreRepeatOptions('');
               resetSelectedMoreRepeatOptions();
             }}
           />
@@ -275,7 +288,7 @@ const styles = StyleSheet.create({
   heading: {
     textAlign: 'center',
     lineHeight: 20,
-    height: 40,
+    height: 60,
     fontWeight: '600',
     fontSize: 16,
   },

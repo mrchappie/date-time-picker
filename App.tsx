@@ -33,8 +33,7 @@ export default function App() {
     <View style={styles.container}>
       <Text style={{ color: '#fff' }}>{formatDate(date)}</Text>
       <Text style={{ color: '#fff' }}>{formatTime(time)}</Text>
-      <Text style={{ color: '#fff' }}>{formatDate(interval.date)}</Text>
-      <Text style={{ color: '#fff' }}>{interval.numOfOcc}</Text>
+      <Text style={{ color: '#fff' }}>{JSON.stringify(interval)}</Text>
       <StatusBar style="auto" />
       <Button
         title="Open Date Picker"
@@ -86,6 +85,7 @@ export default function App() {
         }}
         onResponse={(interval) => {
           setInterval(interval);
+          setIsIntervalPickerVisible(false);
         }}
       />
     </View>
