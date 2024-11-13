@@ -3,26 +3,25 @@ import React, { useEffect, useState } from 'react';
 import DatePicker from '../DateTimePickerComponent/DatePicker';
 import Button from '../DateTimePickerComponent/UI/Button';
 import {
-  advancedRepeatOptions,
-  basicRepeatOptions,
-  moreAdvancedRepeatOptions,
-  moreBasicRepeatOptions,
+  formatDate,
+  IntervalResponseInterface,
   RepeatProps,
 } from '../DateTimePickerComponent/utils/utils';
 import useSetRepeatOptionValue from '../DateTimePickerComponent/utils/useSetRepeatOptionValue';
 
-type BasicReapeatProps = RepeatProps;
-type AdvancedReapeatProps = RepeatProps;
-type CustomReapeatProps = RepeatProps;
-
 type IntervalPickerStyle1 = {
-  onResponse: (data: { whenToRepeat: any; numOfOcc: number }) => void;
+  onResponse: (data: IntervalResponseInterface) => void;
 };
-
-const defaultRepeatOption = basicRepeatOptions[0];
 
 const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
   const { onResponse } = props;
+  const {
+    advancedRepeatOptions,
+    basicRepeatOptions,
+    moreBasicRepeatOptions,
+    moreAdvancedRepeatOptions,
+  } = useSetRepeatOptionValue();
+  const defaultRepeatOption = basicRepeatOptions[0];
 
   const [isDatePickerModalOpen, setIsDatePickerModalOpen] =
     useState<boolean>(false);
@@ -30,23 +29,21 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
     defaultRepeatOption,
   ]);
   const [numOfOccurences, setNumOfOccurences] = useState<number>(1);
-  const [selectedCustomDates, setSelectedCustomDates] = useState<string[]>([]);
+
   const [showMoreRepeatOptions, setShowMoreRepeatOptions] = useState<
     string | undefined
   >('');
 
-  const { getRepeatInterval, resetSelectedMoreRepeatOptions, timeInMs } =
-    useSetRepeatOptionValue();
-
   function handleSetSelectedDates(dateInMs: number) {
-    const dateAsString = new Date(dateInMs).toLocaleDateString('en-US', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-    setSelectedCustomDates([dateAsString]);
-    setRepeatOption([defaultRepeatOption]);
+    setRepeatOption([
+      {
+        id: 'customDates',
+        repeatPlaceholder: 'Calendar',
+        heading: 'on this date: ',
+        value: [dateInMs],
+        repeatType: 'monthly',
+      },
+    ]);
     setIsDatePickerModalOpen(false);
   }
 
@@ -76,18 +73,29 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
       }
       return [];
     });
-    setSelectedCustomDates([]);
   }
 
   function handleSaveIntervalButton() {
-    if (repeatOption) {
-      onResponse({ whenToRepeat: repeatOption, numOfOcc: numOfOccurences });
-    } else {
-      console.log(selectedCustomDates, 'here 2');
-    }
+    const response: IntervalResponseInterface = {
+      whenToRepeat: [],
+      numOfOcc: numOfOccurences,
+    };
+
+    [...repeatOption].forEach((rptOpt) => {
+      const cleanRepeatOptionObject = {
+        daysWhenToRepeat: rptOpt.value,
+        repeatType: rptOpt.repeatType,
+      };
+
+      response.whenToRepeat.push(cleanRepeatOptionObject);
+      return;
+    });
+
+    onResponse(response);
+    // console.log(response);
   }
 
-  function renderRepeatType(item: RepeatProps, id: number) {
+  function renderRepeatType(item: RepeatProps, id: string) {
     let isSelected = repeatOption.some(
       (repeatOption) => repeatOption.id === item.id
     );
@@ -95,36 +103,37 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
     return (
       <Pressable
         onPress={() => {
-          if (id === 11) {
+          if (id === 'u1v2w3x4') {
             setShowMoreRepeatOptions('basic');
             // setRepeatOption([]);
             // return;
           }
-          if (id === 22) {
+          if (id === 'j10k11l12') {
             setShowMoreRepeatOptions('advanced');
             // setRepeatOption([]);
             // return;
           }
-
-          handleSelectRepeatOption(item);
+          if (id != 'u1v2w3x4' && id != 'j10k11l12') {
+            handleSelectRepeatOption(item);
+          }
 
           // console.log(getRepeatInterval(item), 'here');
         }}
       >
         <Text style={[styles.picker, !isSelected && styles.isSelected]}>
-          {item.repeatValue}
+          {item.repeatPlaceholder}
         </Text>
       </Pressable>
     );
   }
 
-  function renderSelectedCustomDates(item: string) {
-    return <Text style={styles.customSelectedDate}>{item}</Text>;
-  }
+  // function renderSelectedCustomDates(item: RepeatProps) {
+  //   return <Text style={styles.customSelectedDate}>{item.value}</Text>;
+  // }
 
-  useEffect(() => {
-    console.log(repeatOption, 'here 3');
-  }, [repeatOption]);
+  // useEffect(() => {
+  //   console.log(repeatOption, 'here 3');
+  // }, [repeatOption]);
 
   function renderMoreRepeatOptions(item: RepeatProps) {
     const isSelected = repeatOption.some(
@@ -140,7 +149,7 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
         <Text
           style={[styles.moreRepeatOption, !isSelected && styles.isSelected]}
         >
-          {item.repeatValue}
+          {item.repeatPlaceholder}
         </Text>
       </Pressable>
     );
@@ -176,8 +185,10 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
               You will get {numOfOccurences}{' '}
               {numOfOccurences === 1 ? 'notification ' : 'notifications '}
               {repeatOption
-                .filter(({ id }) => id != 11 && id != 22)
-                .map(({ heading }) => heading)
+                .filter(({ repeatType }) => repeatType != 'more')
+                .map(({ heading, id, value }) =>
+                  id != 'customDates' ? heading : heading + formatDate(value)
+                )
                 .join(', ')}
             </Text>
           )}
@@ -222,13 +233,13 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
               }}
               onResponse={(response) => handleSetSelectedDates(response)}
             />
-            <FlatList
-              data={selectedCustomDates}
+            {/* <FlatList
+              data={repeatOption}
               renderItem={({ item }) => renderSelectedCustomDates(item)}
               numColumns={3}
               contentContainerStyle={{ paddingTop: 10, gap: 10 }}
               columnWrapperStyle={{ gap: 10 }}
-            />
+            /> */}
           </View>
           <View style={styles.insideContainer}>
             <Text style={styles.label}>End after num. of occurences</Text>
@@ -263,7 +274,6 @@ const IntervalPickerStyle1: React.FC<IntervalPickerStyle1> = (props) => {
             defaultSelected
             onButtonPress={() => {
               setShowMoreRepeatOptions('');
-              resetSelectedMoreRepeatOptions();
             }}
           />
         </View>

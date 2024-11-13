@@ -1,6 +1,7 @@
 import { Text, View } from 'react-native';
 import IntervalPickerStyle1 from '../styles/IntervalPickerStyle1';
 import ModalManager from './UI/ModalManager';
+import { IntervalResponseInterface } from './utils/utils';
 
 type ComponentName =
   | 'IntervalPickerStyle1'
@@ -12,14 +13,12 @@ type IntervalPickerProps = {
   onModalClose: () => void;
   isModalVisible?: boolean;
   withModal?: boolean;
-  onResponse: (data: { whenToRepeat: any; numOfOcc: number }) => void;
-  defaultDateValue?: number;
+  onResponse: (data: IntervalResponseInterface) => void;
 };
 
 type StylesLookupProps = {
   [key: string]: React.ComponentType<{
-    onResponse: (data: { whenToRepeat: any; numOfOcc: number }) => void;
-    defaultDate?: number;
+    onResponse: (data: IntervalResponseInterface) => void;
   }>;
 };
 
@@ -34,7 +33,6 @@ const IntervalPicker = (props: IntervalPickerProps) => {
     withModal = true,
     onModalClose,
     onResponse,
-    defaultDateValue = 1729976400000,
   } = props;
   const Component = StylesLookup[componentName];
 
@@ -55,7 +53,7 @@ const IntervalPicker = (props: IntervalPickerProps) => {
   // return component with modal
   return (
     <ModalManager visible={isModalVisible} onCloseModal={onModalClose}>
-      <Component onResponse={onResponse} defaultDate={defaultDateValue} />
+      <Component onResponse={onResponse} />
     </ModalManager>
   );
 };

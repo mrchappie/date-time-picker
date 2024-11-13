@@ -15,7 +15,7 @@ export default function App() {
   const [isTimePickerVisible, setIsTimePickerVisible] =
     useState<boolean>(false);
   const [isIntervalPickerVisible, setIsIntervalPickerVisible] =
-    useState<boolean>(true);
+    useState<boolean>(false);
 
   const [date, setDate] = useState<number>(new Date('2024-10-17').getTime());
   const [time, setTime] = useState<number>(0);
@@ -31,7 +31,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={{ color: '#fff' }}>{formatDate(date)}</Text>
+      <Text style={{ color: '#fff' }}>{formatDate([date])}</Text>
       <Text style={{ color: '#fff' }}>{formatTime(time)}</Text>
       <Text style={{ color: '#fff' }}>{JSON.stringify(interval)}</Text>
       <StatusBar style="auto" />
