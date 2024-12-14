@@ -1,7 +1,7 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import DatePicker from '../DateTimePickerComponent/DatePicker';
-import Button from '../DateTimePickerComponent/UI/Button';
+import { Button } from '../DateTimePickerComponent/UI/Button';
 import {
   formatDate,
   IntervalResponseInterface,

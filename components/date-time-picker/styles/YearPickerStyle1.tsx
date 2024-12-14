@@ -1,14 +1,14 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
 
-type YearPickerProps = {
+type YearPickerStyle1Props = {
   currentYear: number;
   onChange: (year: number) => void;
 };
 const yearsArray = new Array(37).fill('').map((_, index) => `${2000 + index}`);
 const ITEM_HEIGHT = 40;
 
-const YearPicker = (props: YearPickerProps) => {
+const YearPickerStyle1 = (props: YearPickerStyle1Props) => {
   const { currentYear, onChange } = props;
   const [year, setYear] = useState<number>(currentYear);
   function renderItem({ item }: { item: string }) {
@@ -31,6 +31,7 @@ const YearPicker = (props: YearPickerProps) => {
         renderItem={renderItem}
         keyExtractor={(item) => item.toString()}
         initialScrollIndex={yearsArray.indexOf(year.toString())}
+        showsVerticalScrollIndicator={false}
         snapToInterval={ITEM_HEIGHT}
         getItemLayout={(_, index) => ({
           length: ITEM_HEIGHT,
@@ -49,14 +50,14 @@ const YearPicker = (props: YearPickerProps) => {
   );
 };
 
-export default YearPicker;
+export default YearPickerStyle1;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 200,
+    height: ITEM_HEIGHT * 5,
     overflow: 'hidden',
     gap: 20,
   },

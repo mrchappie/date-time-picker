@@ -1,17 +1,25 @@
-export const months = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
+export const months: Month[] = [
+  // { id: 999, month: '' },
+  // { id: 999, month: '' },
+  { id: 0, month: 'January' },
+  { id: 1, month: 'February' },
+  { id: 2, month: 'March' },
+  { id: 3, month: 'April' },
+  { id: 4, month: 'May' },
+  { id: 5, month: 'June' },
+  { id: 6, month: 'July' },
+  { id: 7, month: 'August' },
+  { id: 8, month: 'September' },
+  { id: 9, month: 'October' },
+  { id: 10, month: 'November' },
+  { id: 11, month: 'December' },
+  // { id: 999, month: '' },
+  // { id: 999, month: '' },
 ];
+export type Month = {
+  id: number;
+  month: string;
+};
 
 export const weekdays = [
   'Sunday',
@@ -29,7 +37,7 @@ export function calculateMonthDaysNumber(
 ): MonthInfo {
   return {
     year: yearToDisplay,
-    month: { name: months[monthToDisplay], index: monthToDisplay },
+    month: { name: months[monthToDisplay].month, index: monthToDisplay },
     firstDay: new Date(yearToDisplay, monthToDisplay, 1).getDay(),
     lastDay: new Date(yearToDisplay, monthToDisplay + 1, 0).getDay(),
     numOfDays: new Date(yearToDisplay, monthToDisplay + 1, 0).getDate(),
@@ -118,3 +126,5 @@ export type IntervalResponseInterface = {
   whenToRepeat: { daysWhenToRepeat: number[]; repeatType: string }[];
   numOfOcc: number;
 };
+
+export type clockType = 'AM' | 'PM';

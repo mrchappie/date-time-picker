@@ -1,8 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
-import HourPicker from '../DateTimePickerComponent/UI/HourPicker';
-import Button from '../DateTimePickerComponent/UI/Button';
-import MinutesPicker from '../DateTimePickerComponent/UI/MinutesPicker';
+import { Button } from '../DateTimePickerComponent/UI/Button';
+import HourPickerStyle2 from './HourPickerStyle2';
+import MinutesPickerStyle2 from './MinutesPickerStyle2';
+import AmPmToggleStyle1 from './AmPmToggleStyle1';
+import { clockType } from '../DateTimePickerComponent/utils/utils';
 
 type TimePickerStyle1Props = {
   visible?: boolean;
@@ -17,41 +19,26 @@ const TimePickerStyle1: React.FC<TimePickerStyle1Props> = ({
 }) => {
   const [selectedHour, setSelectedHour] = useState<number>(0);
   const [selectedMinutes, setSelectedMinutes] = useState<number>(0);
-  // function handleScrollReachedStart() {
-  //   setExtendedHoursList((prevState) => {
-  //     return [
-  //       ...hours,
-  //       ...prevState.slice(0, prevState.length - VISIBLE_ITEMS),
-  //     ];
-  //   });
-  // }
-
-  // // useEffect(() => {
-  // //   console.log(extendedHoursList.length);
-  // // }, [extendedHoursList]);
-
-  // function handleScrollReachedEnd() {
-  //   const newData = [...extendedHoursList, ...hours];
-
-  //   setExtendedHoursList(newData);
-  //   // if (newData.length > hours.length * 2) {
-  //   // const slicedData = newData.slice(hours.length);
-  //   // setExtendedHoursList(slicedData);
-  //   // } else {
-  //   // }
-  // }
+  const [clockType, setClockType] = useState<clockType>('AM');
 
   return (
     <View style={styles.container}>
       <View style={styles.pickersContainer}>
-        <HourPicker
+        <HourPickerStyle2
+          clockType={clockType}
           onChangeHour={(hour) => {
             setSelectedHour(hour);
           }}
         />
-        <MinutesPicker
+        <MinutesPickerStyle2
           onChangeMinutes={(minutes) => {
             setSelectedMinutes(minutes);
+          }}
+        />
+        <AmPmToggleStyle1
+          clockType={clockType}
+          onClockTypeChange={(value) => {
+            setClockType(value);
           }}
         />
       </View>
@@ -89,6 +76,7 @@ const styles = StyleSheet.create({
   },
   pickersContainer: {
     flexDirection: 'row',
+    gap: 20,
   },
   timeDisplay: {
     flexDirection: 'row',

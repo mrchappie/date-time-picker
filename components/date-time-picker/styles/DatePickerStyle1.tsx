@@ -6,9 +6,9 @@ import {
   months,
   weekdays,
 } from '../DateTimePickerComponent/utils/utils';
-import Button from '../DateTimePickerComponent/UI/Button';
-import MonthPicker from '../DateTimePickerComponent/UI/MontPicker';
-import YearPicker from '../DateTimePickerComponent/UI/YearPicker';
+import { Button } from '../DateTimePickerComponent/UI/Button';
+import MonthPickerStyle2 from './MonthPikerStyle2';
+import YearPickerStyle2 from './YearPickerStyle2';
 
 type DatePickerStyle1Props = {
   calendarSelectType: 'single' | 'multiple'; // | 'range';
@@ -23,8 +23,8 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
 }) => {
   // if no default date, set the date to current date
   const DATE = defaultDate ? new Date(defaultDate as number) : new Date();
-  const [isYearMonthPickerVisible, setIsYearMonthPickerVisible] =
-    useState<boolean>(false);
+  const [isMonthPickerOpen, setIsMonthPickerOpen] = useState<boolean>(false);
+  const [isYearPickerOpen, setIsYearPickerOpen] = useState<boolean>(false);
   const [currentDate] = useState(new Date());
 
   const [selectedMonth, setSelectedMonth] = useState<number>(DATE.getMonth());
@@ -109,19 +109,22 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
     <View style={styles.container}>
       <View style={styles.headerButtons}>
         <Button
-          title={`${months[selectedMonth]} - ${selectedYear.toString()}`}
+          title={`${months[selectedMonth].month} - ${selectedYear.toString()}`}
           defaultSelected
           onButtonPress={() => {
-            setIsYearMonthPickerVisible(!isYearMonthPickerVisible);
+            setIsMonthPickerOpen(true);
+            // if (!isYearPickerOpen) {
+            setIsYearPickerOpen(false);
+            // }
           }}
         />
       </View>
-      {!isYearMonthPickerVisible && (
+      {!isMonthPickerOpen && !isYearPickerOpen && (
         <>
           <View style={styles.changeMonthButtons}>
             <Button
               title={`${
-                selectedMonth > 0 ? months[selectedMonth - 1] : months[11]
+                selectedMonth > 0 ? months[selectedMonth - 1].month : months[11]
               }`}
               defaultSelected
               onButtonPress={() => {
@@ -137,7 +140,7 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
             />
             <Button
               title={`${
-                selectedMonth < 11 ? months[selectedMonth + 1] : months[0]
+                selectedMonth < 11 ? months[selectedMonth + 1].month : months[0]
               }`}
               defaultSelected
               onButtonPress={() => {
@@ -185,18 +188,26 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
           </View>
         </>
       )}
-      {isYearMonthPickerVisible && (
+      {isMonthPickerOpen && (
         <View style={styles.yearMonthPickerContainer}>
-          <MonthPicker
+          <MonthPickerStyle2
             currentMonth={selectedMonth}
             onChange={(monthIndex) => {
               setSelectedMonth(monthIndex);
+              setIsMonthPickerOpen(false);
+              setIsYearPickerOpen(true);
             }}
           />
-          <YearPicker
+        </View>
+      )}
+      {isYearPickerOpen && (
+        <View style={styles.yearMonthPickerContainer}>
+          <YearPickerStyle2
             currentYear={selectedYear}
             onChange={(year) => {
               setSelectedYear(year);
+              setIsYearPickerOpen(false);
+              setIsMonthPickerOpen(false);
             }}
           />
         </View>
@@ -208,9 +219,9 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
             fontSize: 16,
           }}
         >
-          {`${weekdays[currentDayOfTheWeek]}, ${months[selectedMonth]} ${selectedDayOfTheMonth} ${selectedYear}`}
+          {`${weekdays[currentDayOfTheWeek]}, ${months[selectedMonth].month} ${selectedDayOfTheMonth} ${selectedYear}`}
         </Text>
-        {!isYearMonthPickerVisible ? (
+        {!isMonthPickerOpen && !isYearPickerOpen ? (
           <Button title="Today" defaultSelected />
         ) : (
           <Button title="Set date" defaultSelected />
