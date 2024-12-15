@@ -1,5 +1,5 @@
 import { StyleSheet, TextInput, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ButtonStyle2 } from '../DateTimePickerComponent/UI/Button';
 import { clockType } from '../DateTimePickerComponent/utils/utils';
 
@@ -10,52 +10,82 @@ type HourPickerStyle2Props = {
   clockType: clockType;
 };
 
+const clockFormats = {
+  AM: {
+    start: 1,
+    end: 12,
+  },
+  PM: {
+    start: 0,
+    end: 23,
+  },
+};
+
 const HourPickerStyle2: React.FC<HourPickerStyle2Props> = (props) => {
   const { onChangeHour, clockType } = props;
   const [selectedHour, setSelectedHour] = useState<number>(0o0);
   const [invalidHour, setInvalidHour] = useState<boolean>(false);
-  const [hourFormat, setHourFormat] = useState<boolean>(false);
 
+  // TODO - on clock type change, use the displayed time to set the selected hour
   useEffect(() => {
-    const currentHour = new Date().getHours();
-    setSelectedHour(currentHour);
-    onChangeHour(currentHour);
-    setHourFormat(clockType === 'AM' ? false : true);
+    const currentHour = new Date()
+      .toLocaleDateString('en-US', {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: clockType === 'AM',
+      })
+      .split(',')[1];
+    setSelectedHour(+currentHour.trim().split(/[:\s]+/)[0]);
+    handleOnChangeHour(+currentHour.trim().split(/[:\s]+/)[0]);
   }, [clockType]);
 
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  function handleOnChangeHour(selectedHour: number) {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = setTimeout(() => {
+      onChangeHour(selectedHour);
+    }, 100);
+  }
   function handleSelectedHour(selectedHour: number | string, type: string) {
     // setInvalidHour(false);
     if (type === 'decrement') {
-      if (+selectedHour > 0) {
+      if (+selectedHour > clockFormats[clockType].start) {
         setSelectedHour((prevState) => {
-          onChangeHour(prevState - 1);
+          handleOnChangeHour(prevState - 1);
           return prevState - 1;
         });
       } else {
-        setSelectedHour(23);
-        onChangeHour(23);
+        const hourBasedOnFormat = clockFormats[clockType].end;
+        setSelectedHour(hourBasedOnFormat);
+        handleOnChangeHour(hourBasedOnFormat);
       }
     }
     if (type === 'increment') {
-      if (+selectedHour < 24) {
+      if (+selectedHour < clockFormats[clockType].end) {
         setSelectedHour((prevState) => {
-          onChangeHour(prevState + 1);
+          handleOnChangeHour(prevState + 1);
           return prevState + 1;
         });
       } else {
-        setSelectedHour(0);
-        onChangeHour(0);
+        setSelectedHour(clockFormats[clockType].start);
+        handleOnChangeHour(clockFormats[clockType].start);
       }
     }
     if (type === 'change') {
       if (!isNaN(Number(selectedHour))) {
         // setInvalidHour(false);
-        if (+selectedHour >= 0 || +selectedHour < 24) {
+        if (
+          +selectedHour >= clockFormats[clockType].start ||
+          +selectedHour < clockFormats[clockType].end
+        ) {
           {
             setSelectedHour(Number(selectedHour));
           }
         }
-        onChangeHour(Number(selectedHour));
+        handleOnChangeHour(Number(selectedHour));
       } else {
         // setInvalidHour(true);
       }
@@ -63,7 +93,7 @@ const HourPickerStyle2: React.FC<HourPickerStyle2Props> = (props) => {
   }
 
   function formatHour(hour: number) {
-    return hour > 10 ? hour : `0${hour}`;
+    return hour >= 10 ? hour : `0${hour}`;
   }
 
   return (

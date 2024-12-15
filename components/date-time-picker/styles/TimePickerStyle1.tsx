@@ -19,7 +19,7 @@ const TimePickerStyle1: React.FC<TimePickerStyle1Props> = ({
 }) => {
   const [selectedHour, setSelectedHour] = useState<number>(0);
   const [selectedMinutes, setSelectedMinutes] = useState<number>(0);
-  const [clockType, setClockType] = useState<clockType>('AM');
+  const [clockType, setClockType] = useState<clockType>('PM');
 
   return (
     <View style={styles.container}>
