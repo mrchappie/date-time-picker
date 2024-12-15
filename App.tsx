@@ -17,7 +17,7 @@ export default function App() {
   const [isIntervalPickerVisible, setIsIntervalPickerVisible] =
     useState<boolean>(false);
 
-  const [date, setDate] = useState<number>(new Date('2024-10-17').getTime());
+  const [date, setDate] = useState<number>(new Date().getTime());
   const [time, setTime] = useState<number>(0);
   const [interval, setInterval] = useState<any>(0);
 
@@ -60,10 +60,11 @@ export default function App() {
           setIsDatePickerVisible(false);
         }}
         onResponse={(date) => {
-          setIsDatePickerVisible(false);
-          setDate(date);
+          // setIsDatePickerVisible(false);
+          // setDate(date);
+          console.log(date);
         }}
-        dateSelectType="single"
+        dateSelectType="range"
         defaultDateValue={date}
       />
       <TimePicker

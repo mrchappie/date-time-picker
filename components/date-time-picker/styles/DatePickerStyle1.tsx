@@ -1,5 +1,5 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   DayInfo,
   generateDaysToDisplay,
@@ -11,8 +11,8 @@ import MonthPickerStyle2 from './MonthPikerStyle2';
 import YearPickerStyle2 from './YearPickerStyle2';
 
 type DatePickerStyle1Props = {
-  calendarSelectType: 'single' | 'multiple'; // | 'range';
-  onResponse: (date: number) => void;
+  calendarSelectType: 'single' | 'multiple' | 'range';
+  onResponse: (date: string[]) => void;
   defaultDate?: number;
 };
 
@@ -23,21 +23,25 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
 }) => {
   // if no default date, set the date to current date
   const DATE = defaultDate ? new Date(defaultDate as number) : new Date();
+  const currentDate = new Date();
+  const selectedDayOfTheMonth = currentDate.getDate();
+
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState<boolean>(false);
   const [isYearPickerOpen, setIsYearPickerOpen] = useState<boolean>(false);
-  const [currentDate] = useState(new Date());
 
   const [selectedMonth, setSelectedMonth] = useState<number>(DATE.getMonth());
   const [selectedYear, setSelectedYear] = useState<number>(DATE.getFullYear());
-  const [selectedDayOfTheMonth] = useState<number>(currentDate.getDate());
   const [currentDayOfTheWeek, setCurrentDayOfTheWeek] = useState<number>(
     currentDate.getDay()
   );
-  const [selectedDays, setSelectedDays] = useState<number[]>([+DATE.getDate()]);
+  const [selectedDays, setSelectedDays] = useState<string[]>([
+    `${DATE.getDate()}-${selectedMonth}-${selectedYear}`,
+    // + 2,
+  ]);
 
-  // useEffect(() => {
-  //   setDayOfTheWeek(selectedDayOfTheMonth);
-  // }, [selectedMonth, selectedYear]);
+  useEffect(() => {
+    setDayOfTheWeek(selectedDayOfTheMonth);
+  }, [selectedMonth, selectedYear]);
 
   function setDayOfTheWeek(dayOfTheMonth: number) {
     const dayOfTheWeek = new Date(
@@ -51,15 +55,30 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
   function handleSelectedDays(dayNumber: number) {
     if (calendarSelectType === 'single') {
       setSelectedDays(() => {
-        return [Number(dayNumber)];
+        const newState = [`${dayNumber}-${selectedMonth}-${selectedYear}`];
+        handleSendDateBackToUser(newState);
+        return newState;
       });
-      handleSendDateBackToUser(dayNumber);
     }
     if (calendarSelectType === 'multiple') {
       setSelectedDays((prevState) => {
-        return [...prevState, Number(dayNumber)];
+        if (
+          !prevState.includes(`${dayNumber}-${selectedMonth}-${selectedYear}`)
+        ) {
+          const newState = [
+            ...prevState,
+            `${dayNumber}-${selectedMonth}-${selectedYear}`,
+          ];
+          handleSendDateBackToUser(newState);
+          return newState;
+        } else {
+          const newState = prevState.filter((date) => {
+            return date !== `${dayNumber}-${selectedMonth}-${selectedYear}`;
+          });
+          handleSendDateBackToUser(newState);
+          return newState;
+        }
       });
-      handleSendDateBackToUser(dayNumber);
     }
     // if (calendarSelectType === 'range') {
     //   setSelectedDays((prevState) => {
@@ -70,14 +89,20 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
     // setSelectedDayOfTheMonth(dayNumber);
   }
 
-  function handleSendDateBackToUser(dayNumber: number) {
-    const date = new Date(selectedYear, selectedMonth, dayNumber).getTime();
-    onResponse(date);
+  function handleSendDateBackToUser(dayNumber: string[]) {
+    // const date = new Date(selectedYear, selectedMonth, dayNumber).getTime();
+    onResponse(dayNumber);
   }
 
   function renderDay({ dayNumber, hideDayBox }: DayInfo) {
-    const isCurrentDay = Number(dayNumber) === selectedDayOfTheMonth;
-    const isDaySelected = selectedDays.some((day) => day === Number(dayNumber));
+    const isCurrentDay =
+      selectedMonth === currentDate.getMonth() &&
+      Number(dayNumber) === selectedDayOfTheMonth;
+
+    const isDaySelected = selectedDays.some(
+      (day) => day === `${dayNumber}-${selectedMonth}-${selectedYear}`
+    );
+
     return (
       <Pressable
         onPress={() => {
@@ -124,7 +149,9 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
           <View style={styles.changeMonthButtons}>
             <Button
               title={`${
-                selectedMonth > 0 ? months[selectedMonth - 1].month : months[11]
+                selectedMonth > 0
+                  ? months[selectedMonth - 1].month
+                  : months[11].month
               }`}
               defaultSelected
               onButtonPress={() => {
@@ -140,7 +167,9 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
             />
             <Button
               title={`${
-                selectedMonth < 11 ? months[selectedMonth + 1].month : months[0]
+                selectedMonth < 11
+                  ? months[selectedMonth + 1].month
+                  : months[0].month
               }`}
               defaultSelected
               onButtonPress={() => {
@@ -160,7 +189,9 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
             <FlatList
               data={weekdays}
               renderItem={({ item, index }) => {
-                const isSelected = currentDayOfTheWeek === index;
+                const isSelected =
+                  selectedMonth === currentDate.getMonth() &&
+                  currentDayOfTheWeek === index;
                 return (
                   <View
                     style={[
@@ -221,11 +252,22 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
         >
           {`${weekdays[currentDayOfTheWeek]}, ${months[selectedMonth].month} ${selectedDayOfTheMonth} ${selectedYear}`}
         </Text>
-        {!isMonthPickerOpen && !isYearPickerOpen ? (
-          <Button title="Today" defaultSelected />
-        ) : (
-          <Button title="Set date" defaultSelected />
-        )}
+        <View style={styles.bottomButtons}>
+          {!isMonthPickerOpen && !isYearPickerOpen ? (
+            <Button title="Today" defaultSelected />
+          ) : (
+            <Button title="Set date" defaultSelected />
+          )}
+          {calendarSelectType === 'range' && (
+            <Button
+              title="Set date"
+              defaultSelected={selectedDays.length > 0}
+              onButtonPress={() => {
+                handleSendDateBackToUser(selectedDays);
+              }}
+            />
+          )}
+        </View>
       </View>
     </View>
   );
@@ -304,7 +346,7 @@ const styles = StyleSheet.create({
     // bottom: 10,
     // left: 10,
     // flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     gap: 10,
   },
@@ -314,5 +356,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     flexGrow: 1,
+  },
+  bottomButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 10,
   },
 });

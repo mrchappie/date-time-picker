@@ -18,7 +18,11 @@ const Button = (props: Props) => {
   const { title, defaultSelected = false, onButtonPress } = props;
   return (
     <Pressable
-      onPress={onButtonPress}
+      onPress={() => {
+        if (defaultSelected) {
+          onButtonPress!();
+        }
+      }}
       style={({ pressed }) => [
         styles.button,
         { opacity: pressed ? 0.6 : defaultSelected ? 1 : 0.75 },
