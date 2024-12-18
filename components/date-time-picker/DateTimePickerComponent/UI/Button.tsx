@@ -12,6 +12,8 @@ type PropsStyle2 = {
   title?: string;
   defaultSelected?: boolean;
   onButtonPress?: () => void;
+  onButtonLongPress?: () => void;
+  onButtonRelease?: () => void;
 };
 
 const Button = (props: Props) => {
@@ -34,7 +36,13 @@ const Button = (props: Props) => {
 };
 
 const ButtonStyle2 = (props: PropsStyle2) => {
-  const { type, defaultSelected = false, onButtonPress } = props;
+  const {
+    type,
+    defaultSelected = false,
+    onButtonPress,
+    onButtonLongPress,
+    onButtonRelease,
+  } = props;
   function UpArrowIcon() {
     return <Icon name="arrow-up" color="white" size={10} />;
   }
@@ -46,6 +54,8 @@ const ButtonStyle2 = (props: PropsStyle2) => {
   return (
     <Pressable
       onPress={onButtonPress}
+      onLongPress={onButtonLongPress}
+      onPressOut={onButtonRelease}
       style={({ pressed }) => [
         styles.button,
         { opacity: pressed ? 0.6 : defaultSelected ? 1 : 0.75 },

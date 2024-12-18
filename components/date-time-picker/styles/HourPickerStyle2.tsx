@@ -23,8 +23,9 @@ const clockFormats = {
 
 const HourPickerStyle2: React.FC<HourPickerStyle2Props> = (props) => {
   const { onChangeHour, clockType } = props;
-  const [selectedHour, setSelectedHour] = useState<number>(0o0);
+  const [selectedHour, setSelectedHour] = useState<number | string>('00');
   const [invalidHour, setInvalidHour] = useState<boolean>(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // TODO - on clock type change, use the displayed time to set the selected hour
   useEffect(() => {
@@ -54,8 +55,8 @@ const HourPickerStyle2: React.FC<HourPickerStyle2Props> = (props) => {
     if (type === 'decrement') {
       if (+selectedHour > clockFormats[clockType].start) {
         setSelectedHour((prevState) => {
-          handleOnChangeHour(prevState - 1);
-          return prevState - 1;
+          handleOnChangeHour(Number(prevState) - 1);
+          return Number(prevState) - 1;
         });
       } else {
         const hourBasedOnFormat = clockFormats[clockType].end;
@@ -66,8 +67,8 @@ const HourPickerStyle2: React.FC<HourPickerStyle2Props> = (props) => {
     if (type === 'increment') {
       if (+selectedHour < clockFormats[clockType].end) {
         setSelectedHour((prevState) => {
-          handleOnChangeHour(prevState + 1);
-          return prevState + 1;
+          handleOnChangeHour(Number(prevState) + 1);
+          return Number(prevState) + 1;
         });
       } else {
         setSelectedHour(clockFormats[clockType].start);
@@ -90,7 +91,35 @@ const HourPickerStyle2: React.FC<HourPickerStyle2Props> = (props) => {
         // setInvalidHour(true);
       }
     }
+    if (type === 'change') {
+      const sanitizedValue = selectedHour.toString().replace(/[^0-9]/g, '');
+
+      if (+sanitizedValue >= 0 && +sanitizedValue < 24) {
+        setSelectedHour(Number(sanitizedValue));
+        onChangeHour(Number(sanitizedValue));
+      }
+    }
+    if (type === 'blur') {
+      setSelectedHour(formatHour(selectedHour as number));
+    }
   }
+
+  const handleLongPress = (type: 'increment' | 'decrement') => {
+    intervalRef.current = setInterval(() => {
+      setSelectedHour((prevState) => {
+        let newHour = Number(prevState);
+
+        if (type === 'decrement') {
+          newHour = newHour > 0 ? newHour - 1 : 23;
+        } else if (type === 'increment') {
+          newHour = newHour < 23 ? newHour + 1 : 0;
+        }
+
+        onChangeHour(newHour);
+        return newHour;
+      });
+    }, 100);
+  };
 
   function formatHour(hour: number) {
     return hour >= 10 ? hour : `0${hour}`;
@@ -103,6 +132,13 @@ const HourPickerStyle2: React.FC<HourPickerStyle2Props> = (props) => {
         title="Decrement"
         defaultSelected
         onButtonPress={() => handleSelectedHour(selectedHour, 'decrement')}
+        onButtonLongPress={() => handleLongPress('increment')}
+        onButtonRelease={() => {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+        }}
       />
       <TextInput
         style={[
@@ -110,17 +146,24 @@ const HourPickerStyle2: React.FC<HourPickerStyle2Props> = (props) => {
           styles.selected,
           invalidHour && styles.invalidHour,
         ]}
-        defaultValue={`${formatHour(selectedHour)}`}
-        // onBlur={() => formatHour(selectedHour)}
+        value={selectedHour.toString()}
         maxLength={2}
-        // keyboardType="numeric"
+        keyboardType="numeric"
         onChangeText={(value) => handleSelectedHour(value, 'change')}
+        onBlur={() => handleSelectedHour(selectedHour, 'blur')}
       />
       <ButtonStyle2
         type="increment"
         title="Incremet"
         defaultSelected
         onButtonPress={() => handleSelectedHour(selectedHour, 'increment')}
+        onButtonLongPress={() => handleLongPress('increment')}
+        onButtonRelease={() => {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+        }}
       />
     </View>
   );

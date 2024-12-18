@@ -1,5 +1,5 @@
 import { StyleSheet, TextInput, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ButtonStyle2 } from '../DateTimePickerComponent/UI/Button';
 
 const ITEM_HEIGHT = 40;
@@ -10,8 +10,9 @@ type MinutesPickerStyle2Props = {
 
 const MinutesPickerStyle2: React.FC<MinutesPickerStyle2Props> = (props) => {
   const { onChangeMinutes } = props;
-  const [selectedMinutes, setSelectedMinutes] = useState<number>(0o0);
+  const [selectedMinutes, setSelectedMinutes] = useState<number | string>('00');
   const [invalidMinutes, setInvalidMinutes] = useState<boolean>(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const currentMinutes = new Date().getMinutes();
@@ -27,8 +28,8 @@ const MinutesPickerStyle2: React.FC<MinutesPickerStyle2Props> = (props) => {
     if (type === 'decrement') {
       if (+selectedMinutes > 0) {
         setSelectedMinutes((prevState) => {
-          onChangeMinutes(prevState - 1);
-          return prevState - 1;
+          onChangeMinutes(Number(prevState) - 1);
+          return Number(prevState) - 1;
         });
       } else {
         setSelectedMinutes(59);
@@ -38,31 +39,47 @@ const MinutesPickerStyle2: React.FC<MinutesPickerStyle2Props> = (props) => {
     if (type === 'increment') {
       if (+selectedMinutes < 59) {
         setSelectedMinutes((prevState) => {
-          onChangeMinutes(prevState + 1);
-          return prevState + 1;
+          onChangeMinutes(Number(prevState) + 1);
+          return Number(prevState) + 1;
         });
       } else {
         setSelectedMinutes(0);
         onChangeMinutes(0);
       }
     }
+
     if (type === 'change') {
-      if (!isNaN(Number(selectedMinutes))) {
-        // setInvalidMinutes(false);
-        if (+selectedMinutes >= 0 || +selectedMinutes < 60) {
-          {
-            setSelectedMinutes(Number(selectedMinutes));
-          }
-        }
-        onChangeMinutes(Number(selectedMinutes));
-      } else {
-        // setInvalidMinutes(true);
+      const sanitizedValue = selectedMinutes.toString().replace(/[^0-9]/g, '');
+
+      if (+sanitizedValue >= 0 && +sanitizedValue < 60) {
+        setSelectedMinutes(Number(sanitizedValue));
+        onChangeMinutes(Number(sanitizedValue));
       }
+    }
+    if (type === 'blur') {
+      setSelectedMinutes(formatMinutes(selectedMinutes as number));
     }
   }
 
-  function formatMinutes(minutes: number) {
-    return minutes > 10 ? minutes : `0${minutes}`;
+  const handleLongPress = (type: 'increment' | 'decrement') => {
+    intervalRef.current = setInterval(() => {
+      setSelectedMinutes((prevState) => {
+        let newMinutes = Number(prevState);
+
+        if (type === 'decrement') {
+          newMinutes = newMinutes > 0 ? newMinutes - 1 : 59;
+        } else if (type === 'increment') {
+          newMinutes = newMinutes < 59 ? newMinutes + 1 : 0;
+        }
+
+        onChangeMinutes(newMinutes);
+        return newMinutes;
+      });
+    }, 100);
+  };
+
+  function formatMinutes(minutes: number): string {
+    return String(minutes > 10 ? minutes : `0${minutes}`);
   }
 
   return (
@@ -74,6 +91,13 @@ const MinutesPickerStyle2: React.FC<MinutesPickerStyle2Props> = (props) => {
         onButtonPress={() =>
           handleSelectedMinutes(selectedMinutes, 'decrement')
         }
+        onButtonLongPress={() => handleLongPress('decrement')}
+        onButtonRelease={() => {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+        }}
       />
       <TextInput
         style={[
@@ -81,11 +105,11 @@ const MinutesPickerStyle2: React.FC<MinutesPickerStyle2Props> = (props) => {
           styles.selected,
           invalidMinutes && styles.invalidMinutes,
         ]}
-        defaultValue={`${formatMinutes(selectedMinutes)}`}
-        // onBlur={() => formatMinutes(selectedMinutes)}
+        value={selectedMinutes.toString()}
         maxLength={2}
-        // keyboardType="numeric"
+        keyboardType="numeric"
         onChangeText={(value) => handleSelectedMinutes(value, 'change')}
+        onBlur={() => handleSelectedMinutes(selectedMinutes, 'blur')}
       />
       <ButtonStyle2
         type="increment"
@@ -94,6 +118,13 @@ const MinutesPickerStyle2: React.FC<MinutesPickerStyle2Props> = (props) => {
         onButtonPress={() =>
           handleSelectedMinutes(selectedMinutes, 'increment')
         }
+        onButtonLongPress={() => handleLongPress('increment')}
+        onButtonRelease={() => {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+        }}
       />
     </View>
   );
