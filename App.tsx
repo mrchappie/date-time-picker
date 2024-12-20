@@ -64,7 +64,7 @@ export default function App() {
           // setDate(date);
           console.log(date);
         }}
-        dateSelectType="range"
+        dateSelectType="single"
         defaultDateValue={date}
       />
       <TimePicker

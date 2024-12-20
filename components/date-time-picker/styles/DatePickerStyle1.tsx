@@ -35,7 +35,7 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
     currentDate.getDay()
   );
   const [selectedDays, setSelectedDays] = useState<string[]>([
-    `${DATE.getDate()}-${selectedMonth}-${selectedYear}`,
+    `${formatDayNumber(DATE.getDate())}/${selectedMonth}/${selectedYear}`,
     // + 2,
   ]);
 
@@ -55,7 +55,9 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
   function handleSelectedDays(dayNumber: number) {
     if (calendarSelectType === 'single') {
       setSelectedDays(() => {
-        const newState = [`${dayNumber}-${selectedMonth}-${selectedYear}`];
+        const newState = [
+          `${formatDayNumber(dayNumber)}/${selectedMonth}/${selectedYear}`,
+        ];
         handleSendDateBackToUser(newState);
         return newState;
       });
@@ -63,17 +65,22 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
     if (calendarSelectType === 'multiple') {
       setSelectedDays((prevState) => {
         if (
-          !prevState.includes(`${dayNumber}-${selectedMonth}-${selectedYear}`)
+          !prevState.includes(
+            `${formatDayNumber(dayNumber)}/${selectedMonth}/${selectedYear}`
+          )
         ) {
           const newState = [
             ...prevState,
-            `${dayNumber}-${selectedMonth}-${selectedYear}`,
+            `${formatDayNumber(dayNumber)}/${selectedMonth}/${selectedYear}`,
           ];
           handleSendDateBackToUser(newState);
           return newState;
         } else {
           const newState = prevState.filter((date) => {
-            return date !== `${dayNumber}-${selectedMonth}-${selectedYear}`;
+            return (
+              date !==
+              `${formatDayNumber(dayNumber)}/${selectedMonth}/${selectedYear}`
+            );
           });
           handleSendDateBackToUser(newState);
           return newState;
@@ -94,13 +101,18 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
     onResponse(dayNumber);
   }
 
+  function formatDayNumber(dayNumber: number) {
+    return dayNumber < 10 ? `0${dayNumber}` : `${dayNumber}`;
+  }
+
   function renderDay({ dayNumber, hideDayBox }: DayInfo) {
     const isCurrentDay =
       selectedMonth === currentDate.getMonth() &&
       Number(dayNumber) === selectedDayOfTheMonth;
 
     const isDaySelected = selectedDays.some(
-      (day) => day === `${dayNumber}-${selectedMonth}-${selectedYear}`
+      (day) =>
+        day === `${formatDayNumber(dayNumber)}/${selectedMonth}/${selectedYear}`
     );
 
     return (
