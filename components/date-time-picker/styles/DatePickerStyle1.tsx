@@ -35,7 +35,7 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
     currentDate.getDay()
   );
   const [selectedDays, setSelectedDays] = useState<string[]>([
-    `${formatDayNumber(DATE.getDate())}/${selectedMonth}/${selectedYear}`,
+    `${selectedMonth + 1}/${formatDayNumber(DATE.getDate())}/${selectedYear}`,
     // + 2,
   ]);
 
@@ -56,7 +56,7 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
     if (calendarSelectType === 'single') {
       setSelectedDays(() => {
         const newState = [
-          `${formatDayNumber(dayNumber)}/${selectedMonth}/${selectedYear}`,
+          `${selectedMonth + 1}/${formatDayNumber(dayNumber)}/${selectedYear}`,
         ];
         handleSendDateBackToUser(newState);
         return newState;
@@ -66,12 +66,14 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
       setSelectedDays((prevState) => {
         if (
           !prevState.includes(
-            `${formatDayNumber(dayNumber)}/${selectedMonth}/${selectedYear}`
+            `${selectedMonth + 1}/${formatDayNumber(dayNumber)}/${selectedYear}`
           )
         ) {
           const newState = [
             ...prevState,
-            `${formatDayNumber(dayNumber)}/${selectedMonth}/${selectedYear}`,
+            `${selectedMonth + 1}/${formatDayNumber(
+              dayNumber
+            )}/${selectedYear}`,
           ];
           handleSendDateBackToUser(newState);
           return newState;
@@ -79,7 +81,9 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
           const newState = prevState.filter((date) => {
             return (
               date !==
-              `${formatDayNumber(dayNumber)}/${selectedMonth}/${selectedYear}`
+              `${selectedMonth + 1}/${formatDayNumber(
+                dayNumber
+              )}/${selectedYear}`
             );
           });
           handleSendDateBackToUser(newState);
@@ -112,7 +116,8 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
 
     const isDaySelected = selectedDays.some(
       (day) =>
-        day === `${formatDayNumber(dayNumber)}/${selectedMonth}/${selectedYear}`
+        day ===
+        `${selectedMonth + 1}/${formatDayNumber(dayNumber)}/${selectedYear}`
     );
 
     return (
