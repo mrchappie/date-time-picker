@@ -14,7 +14,7 @@ type DatePickerProps = {
   onModalClose: () => void;
   isModalVisible?: boolean;
   withModal?: boolean;
-  onResponse: (date: string[]) => void;
+  onResponse: (date: number[]) => void;
   dateSelectType?: DateSelectType;
   defaultDateValue?: number;
 };
@@ -22,7 +22,7 @@ type DatePickerProps = {
 type StylesLookupProps = {
   [key: string]: React.ComponentType<{
     calendarSelectType: DateSelectType;
-    onResponse: (date: string[]) => void;
+    onResponse: (date: number[]) => void;
     defaultDate?: number;
   }>;
 };

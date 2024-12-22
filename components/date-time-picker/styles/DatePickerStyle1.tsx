@@ -12,7 +12,7 @@ import YearPickerStyle2 from './YearPickerStyle2';
 
 type DatePickerStyle1Props = {
   calendarSelectType: 'single' | 'multiple' | 'range';
-  onResponse: (date: string[]) => void;
+  onResponse: (date: number[]) => void;
   defaultDate?: number;
 };
 
@@ -101,8 +101,10 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
   }
 
   function handleSendDateBackToUser(dayNumber: string[]) {
-    // const date = new Date(selectedYear, selectedMonth, dayNumber).getTime();
-    onResponse(dayNumber);
+    const dateInMiliseconds = dayNumber.map((day) => {
+      return new Date(day).getTime();
+    });
+    onResponse(dateInMiliseconds);
   }
 
   function formatDayNumber(dayNumber: number) {
