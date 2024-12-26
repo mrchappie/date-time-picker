@@ -273,9 +273,9 @@ const DatePickerStyle1: React.FC<DatePickerStyle1Props> = ({
         </Text>
         <View style={styles.bottomButtons}>
           {!isMonthPickerOpen && !isYearPickerOpen ? (
-            <Button title="Today" defaultSelected />
+            <Button title="Today" defaultSelected onButtonPress={() => {}} />
           ) : (
-            <Button title="Set date" defaultSelected />
+            <Button title="Set date" defaultSelected onButtonPress={() => {}} />
           )}
           {calendarSelectType === 'range' && (
             <Button
